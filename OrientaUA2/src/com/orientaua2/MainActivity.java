@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
 		btShow.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v) {				
 				gps = new GPSManager(MainActivity.this);
 				
 				if(gps.canGetLocation()) {
@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
 					double longitude = gps.getLongitude();
 					
 					Toast.makeText(getApplicationContext(), "Coordenadas: - \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), gps.getAddress(40.416949,-3.703347), Toast.LENGTH_LONG).show();
 				}
 				else
 					gps.setSettings();

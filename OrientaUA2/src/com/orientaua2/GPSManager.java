@@ -1,10 +1,16 @@
 package com.orientaua2;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import android.app.AlertDialog;
+import android.location.Geocoder; 
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,24 +18,26 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 public class GPSManager extends Service implements LocationListener {
 	
-	private final Context mContext;
+	private final Context context;
     private boolean GPSEnabled;
     private boolean networkEnabled;
     private boolean canGetLocation;
     private Location location; 
     private double latitude; 
     private double longitude;
+    
     private LocationManager manager;
+    private Geocoder geocoder;
     
     private static final long MIN_DISTANCE = 10;    
     private static final long MIN_TIME = 1000 * 60 * 1; // 1 minute
     
-    public GPSManager(Context mContext) {
-		super();
-		this.mContext = mContext;
+    public GPSManager(Context mContext) {		    	    
+		context = mContext;
 		GPSEnabled = false;
 		networkEnabled = false;
 		canGetLocation = false;
@@ -37,7 +45,7 @@ public class GPSManager extends Service implements LocationListener {
 	}
     
     public void setLocation() {
-    	manager =  (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+    	manager =  (LocationManager) context.getSystemService(LOCATION_SERVICE);
     	
     	GPSEnabled = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     	networkEnabled = manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -75,14 +83,14 @@ public class GPSManager extends Service implements LocationListener {
     }
     
     public void setSettings() {
-    	AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+    	AlertDialog.Builder alert = new AlertDialog.Builder(context);
     	alert.setTitle("Ajustes de GPS");
     	alert.setMessage("El GPS no está activado. ¿Quiere al menú de ajustes?");
     	
     	alert.setPositiveButton("Ajustes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                mContext.startActivity(intent);
+                context.startActivity(intent);
             }
         });
     	
@@ -92,6 +100,33 @@ public class GPSManager extends Service implements LocationListener {
             }
         });
     	alert.show();    	
+    }
+    
+    public String getAddress(double latitude, double longitude) {
+    	geocoder=new Geocoder(context,Locale.getDefault());
+    	String result="Localización no encontrada";
+    	    	    	
+    	try {
+			List<Address> addresses=geocoder.getFromLocation(39.017,125.73, 1);
+			
+			if(addresses.size()>0) {
+				Address address=addresses.get(0);
+				StringBuilder str=new StringBuilder();
+				
+				for(int i=0; i<address.getMaxAddressLineIndex(); i++)
+					str.append(address.getAddressLine(i)).append("\n");
+				
+				str.append(address.getLocality()).append("\n");
+				str.append(address.getPostalCode()).append("\n");
+				str.append(address.getCountryName()); 
+				
+				result=str.toString();
+			}			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return result;    	
     }
     
     //Getters and setters

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.location.Geocoder; 
 import android.app.Service;
@@ -14,12 +15,15 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
+@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 public class GPSManager extends Service implements LocationListener {
 	
 	private final Context context;
@@ -41,8 +45,10 @@ public class GPSManager extends Service implements LocationListener {
 		GPSEnabled = false;
 		networkEnabled = false;
 		canGetLocation = false;
-		setLocation();
+		setLocation();		
 	}
+    
+    
     
     public void setLocation() {
     	manager =  (LocationManager) context.getSystemService(LOCATION_SERVICE);
@@ -55,10 +61,12 @@ public class GPSManager extends Service implements LocationListener {
     		
     		if(networkEnabled) {
     			setLocationParameters(LocationManager.NETWORK_PROVIDER);
+    			//Toast.makeText(getApplicationContext(), "Por Red", Toast.LENGTH_LONG).show();
     		}
     		
     		if(GPSEnabled && location==null) {
     			setLocationParameters(LocationManager.GPS_PROVIDER);
+    			//Toast.makeText(getApplicationContext(), "Por GPS", Toast.LENGTH_LONG).show();
     		}
     	}    	
     }
@@ -105,27 +113,56 @@ public class GPSManager extends Service implements LocationListener {
     public String getAddress(double latitude, double longitude) {
     	geocoder=new Geocoder(context,Locale.getDefault());
     	String result="Localización no encontrada";
-    	    	    	
-    	try {
-			List<Address> addresses=geocoder.getFromLocation(39.017,125.73, 1);
-			
-			if(addresses.size()>0) {
-				Address address=addresses.get(0);
-				StringBuilder str=new StringBuilder();
-				
-				for(int i=0; i<address.getMaxAddressLineIndex(); i++)
-					str.append(address.getAddressLine(i)).append("\n");
-				
-				str.append(address.getLocality()).append("\n");
-				str.append(address.getPostalCode()).append("\n");
-				str.append(address.getCountryName()); 
-				
-				result=str.toString();
-			}			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	
+    	if(Geocoder.isPresent()) {    	
+        	try {
+    			List<Address> addresses=geocoder.getFromLocation(latitude, longitude, 1);
+    			
+    			if(addresses.size()>0) {
+    				Address address=addresses.get(0);
+    				StringBuilder str=new StringBuilder();
+    				
+    				for(int i=0; i<address.getMaxAddressLineIndex(); i++)
+    					str.append(address.getAddressLine(i)).append("\n");
+    				
+    				str.append(address.getLocality()).append("\n");
+    				str.append(address.getPostalCode()).append("\n");
+    				str.append(address.getCountryName()); 
+    				
+    				result=str.toString();
+    			}			
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			System.err.println("EXCEPCION");
+    		}
+    	}
+    	else
+    		result="Servicio no disponible";
+    	
+    	return result;    	
+    }
+    
+    public String getCoordinates(String name) {
+    	geocoder=new Geocoder(context,Locale.getDefault());
+    	String result="Localización no encontrada";
+    	    	   
+    	if(Geocoder.isPresent()) {    	
+        	try {
+    			List<Address> addresses=geocoder.getFromLocationName(name, 1);
+    			
+    			if(addresses.size()>0) {
+    				Address address=addresses.get(0);
+    				   				
+    				result=address.getLatitude()+","+address.getLongitude();
+    			}			
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			System.err.println("EXCEPCION");
+    		}
+    	}
+    	else
+    		result="Servicio no disponible";
+    	
     	return result;    	
     }
     
@@ -159,10 +196,11 @@ public class GPSManager extends Service implements LocationListener {
 			
 		return longitude;
 	}
+	
 	@Override
 	public void onLocationChanged(Location arg0) {
 		// TODO Auto-generated method stub
-		
+		setLocation();
 	}
 
 	@Override

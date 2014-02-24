@@ -1,5 +1,6 @@
 package com.orientaua2;
 
+import java.util.Locale;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
@@ -8,8 +9,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 
-public class MainActivity extends Activity implements TextToSpeech.OnInitListener {
+public class MainActivity extends Activity implements OnInitListener {
 	private GPSManager gps;
 	private TextToSpeech tts;
 	
@@ -19,6 +21,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 		setContentView(R.layout.activity_main);
 		
 		gps = new GPSManager(MainActivity.this);
+		
+		//Inicializamos el speaker, con idioma español					
+		tts=new TextToSpeech(this, this);
+			
 		Button btCurrent = (Button)findViewById(R.id.btCurrent);
 		
 		btCurrent.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +70,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 			@Override
 			public void onClick(View arg0) {				
 				String address = ((TextView)findViewById(R.id.tbAddress)).getText().toString();				
-								
+				tts.speak(address,  TextToSpeech.QUEUE_FLUSH, null);			
 			}
 		});
 		
@@ -90,19 +96,24 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
 	@Override
 	public void onInit(int status) {
-		if ( status == TextToSpeech.LANG_MISSING_DATA | status == TextToSpeech.LANG_NOT_SUPPORTED )
-			Toast.makeText( this, "ERROR LANG_MISSING_DATA | LANG_NOT_SUPPORTED", Toast.LENGTH_SHORT ).show();       		
+		Locale lang = new Locale("es");
+		tts.setLanguage(lang);		
+		
+		/*if(tts.isLanguageAvailable(lang)){
+			tts.setLanguage(lang);
+		}*/
+		//if ( status == TextToSpeech.LANG_MISSING_DATA | status == TextToSpeech.LANG_NOT_SUPPORTED )
+			//Toast.makeText( this, "ERROR LANG_MISSING_DATA | LANG_NOT_SUPPORTED", Toast.LENGTH_SHORT ).show();       		
 	}
 	
 	  @Override
       protected void onDestroy()
       {
-              if ( tts != null )
-              {
-                      tts.stop();
-                      tts.shutdown();
-              }
-              super.onDestroy();
+	      if ( tts != null ) {
+	    	  tts.stop();
+	          tts.shutdown();
+	      }
+	      super.onDestroy();
       }
 	
 	@Override

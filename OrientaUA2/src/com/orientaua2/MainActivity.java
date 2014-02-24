@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements OnInitListener {
 			
 			@Override
 			public void onClick(View arg0) {				
-				String address = ((TextView)findViewById(R.id.tbAddress)).getText().toString();				
+				String address = ((TextView)findViewById(R.id.tbAddress)).getText().toString();							
 				tts.speak(address,  TextToSpeech.QUEUE_FLUSH, null);			
 			}
 		});
@@ -97,13 +97,17 @@ public class MainActivity extends Activity implements OnInitListener {
 	@Override
 	public void onInit(int status) {
 		Locale lang = new Locale("es");
-		tts.setLanguage(lang);		
+		int result=tts.setLanguage(lang);		
 		
-		/*if(tts.isLanguageAvailable(lang)){
-			tts.setLanguage(lang);
-		}*/
-		//if ( status == TextToSpeech.LANG_MISSING_DATA | status == TextToSpeech.LANG_NOT_SUPPORTED )
-			//Toast.makeText( this, "ERROR LANG_MISSING_DATA | LANG_NOT_SUPPORTED", Toast.LENGTH_SHORT ).show();       		
+		if (status == TextToSpeech.SUCCESS) {		
+			if(result==TextToSpeech.LANG_AVAILABLE)
+				tts.setLanguage(lang);
+			else
+				Toast.makeText( this, "Error: Idioma no soportado", Toast.LENGTH_SHORT ).show();   
+		}
+		else
+			Toast.makeText( this, "Error al inicializar TextToSpeech", Toast.LENGTH_SHORT ).show();
+		
 	}
 	
 	  @Override

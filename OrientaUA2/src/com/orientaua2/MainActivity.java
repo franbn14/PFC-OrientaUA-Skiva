@@ -1,8 +1,12 @@
 package com.orientaua2;
 
 import java.util.Locale;
+
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -24,7 +28,7 @@ public class MainActivity extends Activity implements OnInitListener {
 		
 		//Inicializamos el speaker, con idioma español					
 		tts=new TextToSpeech(this, this);
-			
+		
 		Button btCurrent = (Button)findViewById(R.id.btCurrent);
 		
 		btCurrent.setOnClickListener(new View.OnClickListener() {
@@ -32,11 +36,16 @@ public class MainActivity extends Activity implements OnInitListener {
 			@Override
 			public void onClick(View v) {											
 				if(gps.canGetLocation()) {
-					double latitude = gps.getLatitude();
-					double longitude = gps.getLongitude();
+					Location current=gps.getCurrentLocation();
+					
+					double latitude = current.getLatitude();
+					double longitude = current.getLongitude();
+					String address="Usted se encuentra en "+gps.getAddress(latitude,longitude);
 					
 					Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
-					Toast.makeText(getApplicationContext(), gps.getAddress(latitude,longitude), Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
+					
+					tts.speak(address, TextToSpeech.QUEUE_FLUSH, null);		
 				}
 				else
 					gps.setSettings();
@@ -44,6 +53,28 @@ public class MainActivity extends Activity implements OnInitListener {
 			}
 		});
 		
+		Button btRoute = (Button)findViewById(R.id.btRoute);
+		
+		btRoute.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				tts.speak("Diga el destino", TextToSpeech.QUEUE_FLUSH, null);				
+			}
+		});
+		
+		Button btExit = (Button)findViewById(R.id.btExit);
+		btExit.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				finish();
+				
+			}
+		});
+		// Fin de la simulación
+		
+		// Parte de pruebas no reales
 		Button btCoords = (Button)findViewById(R.id.btCoords);
 		
 		btCoords.setOnClickListener(new View.OnClickListener() {
@@ -85,25 +116,32 @@ public class MainActivity extends Activity implements OnInitListener {
 				
 				if(gps.canGetLocation()) {						
 					if(latitude!=null && longitude!=null) {				
-						Toast.makeText(getApplicationContext(), gps.getAddress(latitude,longitude), Toast.LENGTH_LONG).show();
+						//Toast.makeText(getApplicationContext(), gps.getAddress(latitude,longitude), Toast.LENGTH_LONG).show();
+						 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345")); 
+						 startActivity(intent);
+
 					}
 				}
 				else
 					gps.setSettings();				
 			}
 		});
+		// Fin parte de pruebas
 	}
 
 	@Override
 	public void onInit(int status) {
-		Locale lang = new Locale("es");
-		int result=tts.setLanguage(lang);		
+		Locale lang = Locale.getDefault();
+		//int result=tts.setLanguage(lang);		
 		
-		if (status == TextToSpeech.SUCCESS) {		
-			if(result==TextToSpeech.LANG_AVAILABLE)
+		if (status == TextToSpeech.SUCCESS) {
+			tts.setLanguage(Locale.getDefault());
+			
+			tts.speak("Bienvenido, ¿qué desea hacer?", TextToSpeech.QUEUE_FLUSH, null);		
+			/*if(result==TextToSpeech.LANG_AVAILABLE)
 				tts.setLanguage(lang);
 			else
-				Toast.makeText( this, "Error: Idioma no soportado", Toast.LENGTH_SHORT ).show();   
+				Toast.makeText( this, "Error: Idioma no soportado", Toast.LENGTH_SHORT ).show();*/   
 		}
 		else
 			Toast.makeText( this, "Error al inicializar TextToSpeech", Toast.LENGTH_SHORT ).show();

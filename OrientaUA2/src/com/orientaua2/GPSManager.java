@@ -1,6 +1,6 @@
 package com.orientaua2;
 
-import java.io.IOException;
+import java.io.IOException;	
 import java.util.List;
 import java.util.Locale;
 
@@ -27,7 +27,7 @@ import android.widget.Toast;
 public class GPSManager extends Service implements LocationListener {
 	
 	private final Context context;
-    private boolean GPSEnabled;
+    private boolean gpsEnabled;
     private boolean networkEnabled;
     private boolean canGetLocation;
     private Location location; 
@@ -36,13 +36,14 @@ public class GPSManager extends Service implements LocationListener {
     
     private LocationManager manager;
     private Geocoder geocoder;
+    private String provider;
     
     private static final long MIN_DISTANCE = 10;    
     private static final long MIN_TIME = 1000 * 60 * 1; // 1 minute
     
     public GPSManager(Context mContext) {		    	    
 		context = mContext;
-		GPSEnabled = false;
+		gpsEnabled = false;
 		networkEnabled = false;
 		canGetLocation = false;
 		setLocation();		
@@ -53,28 +54,27 @@ public class GPSManager extends Service implements LocationListener {
     public void setLocation() {
     	manager =  (LocationManager) context.getSystemService(LOCATION_SERVICE);
     	
-    	GPSEnabled = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    	gpsEnabled = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     	networkEnabled = manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     	
-    	if(GPSEnabled || networkEnabled) {
+    	if(gpsEnabled || networkEnabled) {
     		canGetLocation=true;
     		
     		if(networkEnabled) {
-    			setLocationParameters(LocationManager.NETWORK_PROVIDER);
+    			provider=LocationManager.NETWORK_PROVIDER;
     			//Toast.makeText(getApplicationContext(), "Por Red", Toast.LENGTH_LONG).show();
     		}
     		
-    		if(GPSEnabled && location==null) {
-    			setLocationParameters(LocationManager.GPS_PROVIDER);
+    		if(gpsEnabled && location==null) {
+    			provider=LocationManager.GPS_PROVIDER;
     			//Toast.makeText(getApplicationContext(), "Por GPS", Toast.LENGTH_LONG).show();
     		}
+    		manager.requestLocationUpdates(provider,MIN_TIME,MIN_DISTANCE,this);
+    		Log.d(provider,provider);
     	}    	
     }
     
-    public void setLocationParameters(String provider) {
-    	manager.requestLocationUpdates(provider,MIN_TIME,MIN_DISTANCE,this);
-		Log.d(provider,provider);
-		
+    public Location getCurrentLocation() {    					
 		if (manager != null) {
             location = manager.getLastKnownLocation(provider);
             if (location != null) {
@@ -82,6 +82,7 @@ public class GPSManager extends Service implements LocationListener {
                 longitude = location.getLongitude();
             }
         }
+		return location;
     }
     
     public void stopGPS() {
@@ -119,15 +120,21 @@ public class GPSManager extends Service implements LocationListener {
     			List<Address> addresses=geocoder.getFromLocation(latitude, longitude, 1);
     			
     			if(addresses.size()>0) {
-    				Address address=addresses.get(0);
+    				Address address=addresses.get(0);    				
     				StringBuilder str=new StringBuilder();
+    				String locality=address.getLocality(), postCode=address.getPostalCode(), country=address.getCountryName();
     				
     				for(int i=0; i<address.getMaxAddressLineIndex(); i++)
     					str.append(address.getAddressLine(i)).append("\n");
     				
-    				str.append(address.getLocality()).append("\n");
-    				str.append(address.getPostalCode()).append("\n");
-    				str.append(address.getCountryName()); 
+    				if(str.indexOf(locality)==-1)
+    					str.append(address.getLocality()).append("\n");
+    				
+    				if(str.indexOf(postCode)==-1)
+    					str.append(postCode).append("\n");
+    				
+    				if(str.indexOf(country)==-1)
+    					str.append(country); 
     				
     				result=str.toString();
     			}			
@@ -197,6 +204,17 @@ public class GPSManager extends Service implements LocationListener {
 		return longitude;
 	}
 	
+	public String getProvider() {		
+		return provider;
+	}
+
+	public void setProvider(String provider) {
+		canGetLocation=manager.isProviderEnabled(provider);
+		
+		if(canGetLocation)
+			this.provider = provider;		
+	}
+
 	@Override
 	public void onLocationChanged(Location arg0) {
 		// TODO Auto-generated method stub

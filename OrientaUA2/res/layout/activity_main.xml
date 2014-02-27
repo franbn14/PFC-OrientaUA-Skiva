@@ -13,62 +13,81 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:text="Ver pos. actual" />
-
-    <EditText
-        android:id="@+id/tbAddress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btCurrent"
-        android:layout_below="@+id/btCurrent"
-        android:layout_marginTop="30dp"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
-
-    <EditText
-        android:id="@+id/tbLatitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tbAddress"
-        android:layout_centerVertical="true"
-        android:ems="10"
-        android:inputType="numberSigned|numberDecimal" />
+        android:text="¿Dónde estoy?" />
 
     <EditText
         android:id="@+id/tbLongitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/btAddress"
         android:layout_alignLeft="@+id/tbLatitude"
-        android:layout_below="@+id/tbLatitude"
-        android:layout_marginTop="21dp"
         android:ems="10"
+        android:hint="Longitud"
         android:inputType="numberSigned|numberDecimal" />
-
-    <Button
-        android:id="@+id/btCoords"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tbLatitude"
-        android:layout_alignLeft="@+id/tbLatitude"
-        android:text="Ver coordenadas" />
 
     <Button
         android:id="@+id/btAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/tbLongitude"
-        android:layout_below="@+id/tbLongitude"
-        android:layout_marginTop="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="14dp"
         android:text="Ver direccion" />
+
+    <EditText
+        android:id="@+id/tbLatitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tbLongitude"
+        android:layout_alignLeft="@+id/tbAddress"
+        android:ems="10"
+        android:hint="Latitud"
+        android:inputType="numberSigned|numberDecimal" />
 
     <Button
         android:id="@+id/btPlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/tbLatitude"
+        android:layout_marginBottom="14dp"
         android:layout_toRightOf="@+id/btCoords"
         android:text="Reproducir" />
+
+    <Button
+        android:id="@+id/btCoords"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btPlay"
+        android:layout_alignBottom="@+id/btPlay"
+        android:layout_alignLeft="@+id/tbLatitude"
+        android:text="Ver coordenadas" />
+
+    <EditText
+        android:id="@+id/tbAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btCurrent"
+        android:layout_centerVertical="true"
+        android:ems="10"
+        android:hint="Dirección" />
+
+    <Button
+        android:id="@+id/btRoute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btCurrent"
+        android:layout_below="@+id/btCurrent"
+        android:layout_marginTop="43dp"
+        android:text="Ir a destino" />
+
+    <Button
+        android:id="@+id/btExit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btCurrent"
+        android:layout_alignBottom="@+id/btCurrent"
+        android:layout_alignRight="@+id/btPlay"
+        android:layout_toRightOf="@+id/btCoords"
+        android:text="Salir" />
 
 </RelativeLayout>

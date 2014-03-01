@@ -90,4 +90,24 @@
         android:layout_toRightOf="@+id/btCoords"
         android:text="Salir" />
 
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tbAddress"
+        android:layout_alignLeft="@+id/btPlay"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/btRoute" >
+
+    </ListView>
+
+    <Button
+        android:id="@+id/btSpeak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/listView1"
+        android:layout_alignRight="@+id/btExit"
+        android:layout_below="@+id/btExit"
+        android:text="Hablar" />
+
 </RelativeLayout>

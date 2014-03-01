@@ -1,5 +1,7 @@
 package com.orientaua2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.location.Location;
@@ -7,17 +9,25 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 
 public class MainActivity extends Activity implements OnInitListener {
 	private GPSManager gps;
 	private TextToSpeech tts;
+	
+	private static final int REQUEST_CODE = 1234;
+	private ListView wordsList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,24 +38,53 @@ public class MainActivity extends Activity implements OnInitListener {
 		
 		//Inicializamos el speaker, con idioma español					
 		tts=new TextToSpeech(this, this);
+
+		//**** Parte de prueba del speechToText
+		Button btSpeak=(Button)findViewById(R.id.btSpeak);			
+		wordsList = (ListView) findViewById(R.id.listView1);
+		PackageManager pm = getPackageManager();
+	    List<ResolveInfo> activities = pm.queryIntentActivities(
+	            new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+	    if (activities.size() == 0)
+	    {
+	        btSpeak.setEnabled(false);	        
+	    	Toast.makeText(getApplicationContext(), "Servicio de micrófono desactivado", Toast.LENGTH_LONG).show();
+			tts.speak("Servicio de micrófono desactivado", TextToSpeech.QUEUE_FLUSH, null);	
+	    }	
 		
+	    
+	    btSpeak.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				startVoiceRecognitionActivity();				
+			}
+		});
+		// Fin de prueba de speechToText*****
+	    
 		Button btCurrent = (Button)findViewById(R.id.btCurrent);
 		
 		btCurrent.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
-			public void onClick(View v) {											
+			public void onClick(View v) {						
 				if(gps.canGetLocation()) {
 					Location current=gps.getCurrentLocation();
 					
-					double latitude = current.getLatitude();
-					double longitude = current.getLongitude();
-					String address="Usted se encuentra en "+gps.getAddress(latitude,longitude);
-					
-					Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
-					Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
-					
-					tts.speak(address, TextToSpeech.QUEUE_FLUSH, null);		
+					if(current!=null) {
+						double latitude = current.getLatitude();
+						double longitude = current.getLongitude();
+						String address="Usted se encuentra en "+gps.getAddress(latitude,longitude);
+						
+						Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
+						Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
+						
+						tts.speak(address, TextToSpeech.QUEUE_FLUSH, null);	
+					}						
+					else {
+						Toast.makeText(getApplicationContext(), "No se ha podido obtener la ubicación", Toast.LENGTH_LONG).show();
+						tts.speak("No se ha podido obtener la ubicación", TextToSpeech.QUEUE_FLUSH, null);	
+					}						
 				}
 				else
 					gps.setSettings();
@@ -127,6 +166,28 @@ public class MainActivity extends Activity implements OnInitListener {
 			}
 		});
 		// Fin parte de pruebas
+	}
+	
+	private void startVoiceRecognitionActivity()
+	{
+	    Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+	    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+	    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voice recognition Demo...");
+	    startActivityForResult(intent, REQUEST_CODE);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+	    if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
+	    {
+	        // Populate the wordsList with the String values the recognition engine thought it heard
+	        ArrayList<String> matches = data.getStringArrayListExtra(
+	                RecognizerIntent.EXTRA_RESULTS);
+	        wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+	                matches));
+	    }
+	    super.onActivityResult(requestCode, resultCode, data);	
 	}
 
 	@Override

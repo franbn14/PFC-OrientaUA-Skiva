@@ -43,8 +43,7 @@ public class MainActivity extends Activity implements OnInitListener {
 		Button btSpeak=(Button)findViewById(R.id.btSpeak);			
 		wordsList = (ListView) findViewById(R.id.listView1);
 		PackageManager pm = getPackageManager();
-	    List<ResolveInfo> activities = pm.queryIntentActivities(
-	            new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+	    List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
 	    if (activities.size() == 0)
 	    {
 	        btSpeak.setEnabled(false);	        
@@ -57,7 +56,8 @@ public class MainActivity extends Activity implements OnInitListener {
 			
 			@Override
 			public void onClick(View v) {
-				startVoiceRecognitionActivity();				
+				startVoiceRecognitionActivity();	
+				
 			}
 		});
 		// Fin de prueba de speechToText*****
@@ -68,27 +68,7 @@ public class MainActivity extends Activity implements OnInitListener {
 			
 			@Override
 			public void onClick(View v) {						
-				if(gps.canGetLocation()) {
-					Location current=gps.getCurrentLocation();
-					
-					if(current!=null) {
-						double latitude = current.getLatitude();
-						double longitude = current.getLongitude();
-						String address="Usted se encuentra en "+gps.getAddress(latitude,longitude);
-						
-						Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
-						Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
-						
-						tts.speak(address, TextToSpeech.QUEUE_FLUSH, null);	
-					}						
-					else {
-						Toast.makeText(getApplicationContext(), "No se ha podido obtener la ubicación", Toast.LENGTH_LONG).show();
-						tts.speak("No se ha podido obtener la ubicación", TextToSpeech.QUEUE_FLUSH, null);	
-					}						
-				}
-				else
-					gps.setSettings();
-				
+				getCurrentLocation();				
 			}
 		});
 		
@@ -98,7 +78,7 @@ public class MainActivity extends Activity implements OnInitListener {
 			
 			@Override
 			public void onClick(View v) {
-				tts.speak("Diga el destino", TextToSpeech.QUEUE_FLUSH, null);				
+				getRoute();			
 			}
 		});
 		
@@ -158,7 +138,7 @@ public class MainActivity extends Activity implements OnInitListener {
 						//Toast.makeText(getApplicationContext(), gps.getAddress(latitude,longitude), Toast.LENGTH_LONG).show();
 						 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345")); 
 						 startActivity(intent);
-
+						 Toast.makeText(getApplicationContext(), intent.getDataString(), Toast.LENGTH_SHORT);
 					}
 				}
 				else
@@ -176,17 +156,58 @@ public class MainActivity extends Activity implements OnInitListener {
 	    startActivityForResult(intent, REQUEST_CODE);
 	}
 	
+	public void getCurrentLocation() {
+		if(gps.canGetLocation()) {
+			Location current=gps.getCurrentLocation();
+			
+			if(current!=null) {
+				double latitude = current.getLatitude();
+				double longitude = current.getLongitude();
+				String address="Usted se encuentra en "+gps.getAddress(latitude,longitude);
+				
+				Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
+				
+				tts.speak(address, TextToSpeech.QUEUE_FLUSH, null);	
+			}						
+			else {
+				Toast.makeText(getApplicationContext(), "No se ha podido obtener la ubicación", Toast.LENGTH_LONG).show();
+				tts.speak("No se ha podido obtener la ubicación", TextToSpeech.QUEUE_FLUSH, null);	
+			}						
+		}
+		else
+			gps.setSettings();
+	}
+	
+	public void getRoute() {
+		tts.speak("Diga el destino", TextToSpeech.QUEUE_FLUSH, null);	
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 	    if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
 	    {
 	        // Populate the wordsList with the String values the recognition engine thought it heard
-	        ArrayList<String> matches = data.getStringArrayListExtra(
-	                RecognizerIntent.EXTRA_RESULTS);
-	        wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-	                matches));
+	        ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+	        wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,matches));	     
+	        
+	        for(String word: matches) {	        	
+	        	if(word.toLowerCase(Locale.getDefault()).contains("donde estoy"))
+	        		getCurrentLocation();
+	        	
+	        	else if(word.toLowerCase(Locale.getDefault()).contains("ir a destino"))
+	        		getRoute();
+	        	
+	        	else if(word.equalsIgnoreCase("Salir"))
+	        		finish();
+	        }
 	    }
+	    else {
+	    	tts.speak("No se ha podido reconocer el destino, por favor, repita. O diga Terminar.", TextToSpeech.QUEUE_FLUSH, null);
+	    	startVoiceRecognitionActivity();
+	    }
+	    
 	    super.onActivityResult(requestCode, resultCode, data);	
 	}
 
@@ -198,7 +219,8 @@ public class MainActivity extends Activity implements OnInitListener {
 		if (status == TextToSpeech.SUCCESS) {
 			tts.setLanguage(Locale.getDefault());
 			
-			tts.speak("Bienvenido, ¿qué desea hacer?", TextToSpeech.QUEUE_FLUSH, null);		
+			tts.speak("Bienvenido, ¿qué desea hacer?", TextToSpeech.QUEUE_FLUSH, null);	
+			startVoiceRecognitionActivity();
 			/*if(result==TextToSpeech.LANG_AVAILABLE)
 				tts.setLanguage(lang);
 			else

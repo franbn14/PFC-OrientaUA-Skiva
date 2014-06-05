@@ -46,11 +46,12 @@ public class GPSManager extends Service implements LocationListener {
 		gpsEnabled = false;
 		networkEnabled = false;
 		canGetLocation = false;
-		setLocation();		
+		//setLocation();		
+				
+		getCurrentLocation();
 		
 		if(!canGetLocation)
 			setSettings();
-		getCurrentLocation();
 	}
     
     
@@ -78,8 +79,41 @@ public class GPSManager extends Service implements LocationListener {
     	}    	
     }
     
-    public Location getCurrentLocation() {    					
-		if (manager != null) {
+    public Location getCurrentLocation() {
+    	manager =  (LocationManager) context.getSystemService(LOCATION_SERVICE);
+    	
+    	if (manager != null) { 
+	    	List<String> providers = manager.getProviders(true);
+	        Location bestLocation = null;
+	        String bestProvider=null;
+	        
+	        for (String provider : providers) {
+	            Location l = manager.getLastKnownLocation(provider);
+	            //Log.d("last known location, provider: %s, location: %s", provider, l);
+	
+	            if (l == null) {
+	                continue;
+	            }
+	            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+	                Log.d("found best last known location: %s", provider);
+	                bestLocation = l;
+	                bestProvider=provider;
+	            }
+	        }
+	        if (bestLocation == null) {
+	            location=null;
+	        }
+	        else {
+	        	canGetLocation=true;
+	        	provider=bestProvider;	        
+	        	location=bestLocation;
+	        	manager.requestLocationUpdates(provider,MIN_TIME,MIN_DISTANCE,this);
+	        	latitude = location.getLatitude();
+	            longitude = location.getLongitude();
+	        }	        	
+    	}
+    	
+		/*if (manager != null) {
             location = manager.getLastKnownLocation(provider);
             if (location != null) {
                 latitude = location.getLatitude();
@@ -87,7 +121,7 @@ public class GPSManager extends Service implements LocationListener {
             }
             /*else
             	Toast.makeText(context, "Location", Toast.LENGTH_LONG).show();*/
-        }
+        //}
 		/*else
 			Toast.makeText(context, "Manager", Toast.LENGTH_LONG).show();*/
 		return location;
@@ -120,11 +154,12 @@ public class GPSManager extends Service implements LocationListener {
     }
     
     public String getAddress(double latitude, double longitude) {
-    	geocoder=new Geocoder(context,Locale.getDefault());
+    	if(geocoder==null)
+    		geocoder=new Geocoder(context,Locale.getDefault());
     	String result="Localización no encontrada";
     	
     	if(Geocoder.isPresent()) { 
-    		Toast.makeText(context, "Geocoder in", Toast.LENGTH_LONG).show();
+    		//Toast.makeText(context, "Geocoder in", Toast.LENGTH_LONG).show();
         	try {
     			List<Address> addresses=geocoder.getFromLocation(latitude, longitude, 1);
     			
@@ -149,8 +184,7 @@ public class GPSManager extends Service implements LocationListener {
     			}
     			else
     				Toast.makeText(context, "Geocoder null", Toast.LENGTH_LONG).show();
-    		} catch (IOException e) {
-    			// TODO Auto-generated catch block
+    		} catch (IOException e) {    			
     			System.err.println("EXCEPCION");
     		}
     	}
@@ -229,9 +263,8 @@ public class GPSManager extends Service implements LocationListener {
 	}
 
 	@Override
-	public void onLocationChanged(Location arg0) {
-		// TODO Auto-generated method stub
-		setLocation();
+	public void onLocationChanged(Location newLocation) {
+		
 	}
 
 	@Override

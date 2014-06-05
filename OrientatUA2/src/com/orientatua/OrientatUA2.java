@@ -23,6 +23,7 @@ import android.widget.Toast;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+ 
 
 public class OrientatUA2 extends Activity {
 	private GPSManager gps;
@@ -39,6 +40,7 @@ public class OrientatUA2 extends Activity {
 				
 		manager=VoiceManager.getInstance(OrientatUA2.this);
 		manager.speak("Bienvenido");
+		manager.waitSpeaking();
 		gps = new GPSManager(OrientatUA2.this);
 		
 		Button btSpeak=(Button)findViewById(R.id.btSpeak);			
@@ -51,14 +53,14 @@ public class OrientatUA2 extends Activity {
 	        btSpeak.setEnabled(false);	        
 	    	Toast.makeText(getApplicationContext(), "Servicio de micrófono desactivado", Toast.LENGTH_LONG).show();
 	    	manager.speak("Micrófono desactivado");			
-	    }	
-		
+	    }		
+	    else
+	    	startVoiceRecognitionActivity(0);
 	    
 	    btSpeak.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				//manager.startVoiceRecognition();
 				startVoiceRecognitionActivity(0);
 				
 			}
@@ -83,80 +85,12 @@ public class OrientatUA2 extends Activity {
 			public void onClick(View v) {						
 				getCurrentLocation();				
 			}
-		});
-		/*
-		
-		Button btRoute = (Button)findViewById(R.id.btRoute);
-		
-		btRoute.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				getRoute();			
-			}
-		});
-				
-		// Fin de la simulaci�n
-		
-		// Parte de pruebas no reales
-		Button btCoords = (Button)findViewById(R.id.btCoords);
-		
-		btCoords.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				String address = ((TextView)findViewById(R.id.tbAddress)).getText().toString();
-				
-				if(gps.canGetLocation()) {
-					if(address!=null && !address.equals("")) {
-						Toast.makeText(getApplicationContext(), gps.getCoordinates(address), Toast.LENGTH_LONG).show();
-						Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
-					}
-				}
-				else
-					gps.setSettings();
-			}
 		});		
-		
-		Button btPlay = (Button)findViewById(R.id.btPlay);
-		
-		btPlay.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {				
-				String address = ((TextView)findViewById(R.id.tbAddress)).getText().toString();							
-				//tts.speak(address,  TextToSpeech.QUEUE_FLUSH, null);			
-			}
-		});
-		
-		Button btAddress = (Button)findViewById(R.id.btAddress);
-		
-		btAddress.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Double latitude = Double.parseDouble((((TextView)findViewById(R.id.tbLatitude)).getText()).toString());
-				Double longitude = Double.parseDouble((((TextView)findViewById(R.id.tbLongitude)).getText()).toString());
-				
-				if(gps.canGetLocation()) {						
-					if(latitude!=null && longitude!=null) {				
-						//Toast.makeText(getApplicationContext(), gps.getAddress(latitude,longitude), Toast.LENGTH_LONG).show();
-						 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345")); 
-						 startActivity(intent);
-						 Toast.makeText(getApplicationContext(), intent.getDataString(), Toast.LENGTH_SHORT);
-					}
-				}
-				else
-					gps.setSettings();				
-			}
-		});
-		// Fin parte de pruebas		
-		 */
 	}
 	
 	private void startVoiceRecognitionActivity(int type) //0 general, 1 destino
 	{
-		//waitSpeaking();				
+		manager.waitSpeaking();				
 		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 	    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 	    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voice recognition Demo...");
@@ -192,19 +126,11 @@ public class OrientatUA2 extends Activity {
 		startVoiceRecognitionActivity(1);
 	}
 	
-	public void waitSpeaking() {
-		/*boolean speaking;
-		do {
-			speaking=tts.isSpeaking();
-		} while(speaking);*/
-	}
-	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 	    if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
-	    {
-	        // Populate the wordsList with the String values the recognition engine thought it heard
+	    {	        
 	        ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 	        wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,matches));	     
 	        
@@ -226,40 +152,4 @@ public class OrientatUA2 extends Activity {
 	    
 	    super.onActivityResult(requestCode, resultCode, data);	
 	}
-/*
-	@Override
-	public void onInit(int status) {
-		Locale lang = Locale.getDefault();
-		//int result=//tts.setLanguage(lang);		
-		
-		if (status == TextToSpeech.SUCCESS) {
-			//tts.setLanguage(Locale.getDefault());
-			
-			//tts.speak("Bienvenido, ¿qué desea hacer?", TextToSpeech.QUEUE_FLUSH, null);	
-			startVoiceRecognitionActivity(0);	
-		}
-		else
-			Toast.makeText( this, "Error al inicializar TextToSpeech", Toast.LENGTH_SHORT ).show();
-		
-	}
-	
-	  @Override
-      protected void onDestroy()
-      {
-	      if ( tts != null ) {
-	    	  //tts.stop();
-	          //tts.shutdown();
-	      }
-	      super.onDestroy();
-      }
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}*/
-
-	
-
 }

@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".OrientatUA2" >
+
+    <Button
+        android:id="@+id/btCurrent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="¿Dónde estoy?" />    
+
+    <Button
+        android:id="@+id/btExit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btCurrent"
+        android:layout_alignBottom="@+id/btCurrent"
+        android:layout_toRightOf="@+id/btCoords"
+        android:text="Salir" />
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tbAddress"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/btRoute" >
+    </ListView>
+
+    <Button
+        android:id="@+id/btSpeak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/listView1"
+        android:layout_alignRight="@+id/btExit"
+        android:layout_below="@+id/btExit"
+        android:text="Hablar" />
+
+</RelativeLayout>

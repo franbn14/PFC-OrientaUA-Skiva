@@ -19,6 +19,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="OrientatUA2"
         android:theme="@style/AppTheme">
+        
         <activity
             android:name="com.orientatua.OrientatUA2"
             android:label="@string/app_name" android:icon="@drawable/ic_launcher">

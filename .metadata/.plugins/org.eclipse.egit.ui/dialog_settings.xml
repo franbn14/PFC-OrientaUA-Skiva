@@ -10,8 +10,8 @@
 	<section name="org.eclipse.egit.ui.internal.dialogs.ResetTargetSelectionDialog.dialogBounds">
 		<item value="528" key="DIALOG_WIDTH"/>
 		<item value="36" key="DIALOG_Y_ORIGIN"/>
-		<item value="739" key="DIALOG_HEIGHT"/>
 		<item value="698" key="DIALOG_X_ORIGIN"/>
+		<item value="739" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="GitCommitMessageComponent">
@@ -19,8 +19,8 @@
 	<section name="org.eclipse.egit.ui.internal.push.PushResultDialog.dialogBounds">
 		<item value="656" key="DIALOG_WIDTH"/>
 		<item value="230" key="DIALOG_Y_ORIGIN"/>
-		<item value="448" key="DIALOG_HEIGHT"/>
 		<item value="634" key="DIALOG_X_ORIGIN"/>
+		<item value="448" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 </section>

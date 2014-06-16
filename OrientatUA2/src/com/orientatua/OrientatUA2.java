@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import com.orientatua2.R;
 
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,9 +27,9 @@ import android.speech.tts.TextToSpeech.OnInitListener;
  
 
 public class OrientatUA2 extends Activity {
-	private GPSManager gps;
-	
+	private GPSManager gps;	
 	private VoiceManager manager;
+	private DirectionsManager directions;
 	
 	private static final int REQUEST_CODE = 1234;
 	private ListView wordsList;
@@ -54,9 +55,9 @@ public class OrientatUA2 extends Activity {
 	    	Toast.makeText(getApplicationContext(), "Servicio de micrófono desactivado", Toast.LENGTH_LONG).show();
 	    	manager.speak("Micrófono desactivado");			
 	    }		
-	    else
-	    	startVoiceRecognitionActivity(0);
-	    
+	    /*else
+	    	startVoiceRecognitionActivity(0);*/
+	    getRoute();
 	    btSpeak.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -98,7 +99,7 @@ public class OrientatUA2 extends Activity {
 			    
 	}
 	
-	public void getCurrentLocation() {
+	public void getCurrentLocation() {		
 		if(gps.canGetLocation()) {
 			Location current=gps.getCurrentLocation();
 			
@@ -121,9 +122,43 @@ public class OrientatUA2 extends Activity {
 			gps.setSettings();
 	}
 	
-	public void getRoute() {
+	public void getRoute() {	
+		directions=new DirectionsManager(getApplicationContext());
 		manager.speak("Diga el destino");	
-		startVoiceRecognitionActivity(1);
+		//startVoiceRecognitionActivity(1);
+		manager.waitSpeaking();
+		
+		float results[]= new float[3];		
+		ArrayList<String> distance=new ArrayList<String>();
+		String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
+		distance.add(error);		
+		
+		//Parte real, comentada para probar la request
+		/*Location current=gps.getCurrentLocation();
+		//String address=gps.getAddress(gps.getCurrentLocation().getLatitude(), gps.getCurrentLocation().getLongitude());//gps.getCoordinates("Plaza Santa Faz, 03690 San Vicente del Raspeig, Alicante");
+		Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
+		
+		
+		
+		if(address!=null) {
+			distance.add("Address ok");
+			//distance.add(gps.getCurrentLocation().getLatitude()+","+gps.getCurrentLocation().getLongitude());
+			distance.add(address.getLatitude()+","+address.getLongitude());
+			//distance.add(gps.getAddress(current.getLatitude(), current.getLongitude()));
+			Location.distanceBetween(gps.getCurrentLocation().getLatitude(), gps.getCurrentLocation().getLongitude(), address.getLatitude(), address.getLongitude(), results);			
+		
+			if(results!=null && results.length>0) {				
+				for(int i=0; i<results.length; i++)
+					distance.add(results[i]+"");		
+			}		
+			String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España", address.toString());
+			distance.add(error);
+			
+		}
+		else
+			distance.add("Address null");*/
+		
+		wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,distance));
 	}
 	
 	@Override

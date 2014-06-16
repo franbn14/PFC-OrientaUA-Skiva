@@ -1,0 +1,65 @@
+package com.orientatua;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class DirectionsManager {
+	private static String key="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
+	private List<String> directions;
+	
+	public boolean makeRequest(String address1, String address2) {
+		String str="http://maps.googleapis.com/maps/api/directions/json";
+		str+="?origin="+address1;
+		str+="&destination="+address2;
+		str+="&key="+key;
+		str+="&mode=walking";
+		
+		try {
+			URL url= new URL(str);
+  		    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	  		InputStream response = new BufferedInputStream(connection.getInputStream());
+	  	    
+	  		if(response!=null && !response.equals("")) {
+	  			parseJSON(response.toString());
+	  			connection.disconnect();
+	  		}
+  			else
+  				return false;
+			
+		} catch (MalformedURLException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
+		}
+		
+		
+		
+	
+		return false;
+	}
+	
+	public boolean parseJSON(String result) {
+		try {
+			JSONObject json = new JSONObject(result);
+			String status=json.getString("status");
+			
+			if(status.equals("OK"))
+				return true;
+			else
+				return false;
+			
+		} catch (JSONException e) {
+			
+		}
+		
+	}
+}

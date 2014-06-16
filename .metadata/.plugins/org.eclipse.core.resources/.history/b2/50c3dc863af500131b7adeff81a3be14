@@ -1,0 +1,5 @@
+package com.orientatua;
+
+public class DirectionsManager {
+	private static String api="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
+}

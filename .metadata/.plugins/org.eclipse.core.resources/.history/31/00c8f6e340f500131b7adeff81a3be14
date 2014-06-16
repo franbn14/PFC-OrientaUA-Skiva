@@ -1,0 +1,35 @@
+package com.orientatua;
+
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class DirectionsManager {
+	private static String api="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
+	private List<String> directions;
+	
+	public boolean makeRequest(String addres1, String address2) {
+		 HttpClient httpclient = new DefaultHttpClient();
+
+	        // Prepare a request object
+	        HttpGet httpget = new HttpGet(url); 
+
+	        // Execute the request
+	        HttpResponse response;
+		
+		return false;
+	}
+	
+	public void parseJSON(String result) {
+		try {
+			JSONObject json = new JSONObject(result);
+			
+			
+		} catch (JSONException e) {
+			
+		}
+		
+	}
+}

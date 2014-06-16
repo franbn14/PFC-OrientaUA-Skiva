@@ -32,7 +32,7 @@ public class GPSManager extends Service implements LocationListener {
     private boolean canGetLocation;
     private Location location; 
     private double latitude; 
-    private double longitude;
+    private double longitude;  
     
     private LocationManager manager;
     private Geocoder geocoder;
@@ -86,17 +86,18 @@ public class GPSManager extends Service implements LocationListener {
 	    	List<String> providers = manager.getProviders(true);
 	        Location bestLocation = null;
 	        String bestProvider=null;
+	        Location temp;
 	        
 	        for (String provider : providers) {
-	            Location l = manager.getLastKnownLocation(provider);
+	        	temp = manager.getLastKnownLocation(provider);
 	            //Log.d("last known location, provider: %s, location: %s", provider, l);
 	
-	            if (l == null) {
+	            if (temp == null) {
 	                continue;
 	            }
-	            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+	            if (bestLocation == null || temp.getAccuracy() < bestLocation.getAccuracy()) {
 	                Log.d("found best last known location: %s", provider);
-	                bestLocation = l;
+	                bestLocation = temp;
 	                bestProvider=provider;
 	            }
 	        }
@@ -160,7 +161,7 @@ public class GPSManager extends Service implements LocationListener {
     	
     	if(Geocoder.isPresent()) { 
     		//Toast.makeText(context, "Geocoder in", Toast.LENGTH_LONG).show();
-        	try {
+        	try {        		
     			List<Address> addresses=geocoder.getFromLocation(latitude, longitude, 1);
     			
     			if(addresses.size()>0) {
@@ -196,27 +197,23 @@ public class GPSManager extends Service implements LocationListener {
     	return result;    	
     }
     
-    public String getCoordinates(String name) {
-    	geocoder=new Geocoder(context,Locale.getDefault());
-    	String result="Localización no encontrada";
-    	    	   
+    public Address getCoordinates(String name) {
+    	if(geocoder==null)
+			geocoder=new Geocoder(context,Locale.getDefault());
+    	Address result=null;
+    	    	    	
     	if(Geocoder.isPresent()) {    	
-        	try {
-    			List<Address> addresses=geocoder.getFromLocationName(name, 1);
-    			
+    		try {
+    			List<Address> addresses=geocoder.getFromLocationName(name, 1);    			
     			if(addresses.size()>0) {
-    				Address address=addresses.get(0);
-    				   				
-    				result=address.getLatitude()+","+address.getLongitude();
-    			}			
-    		} catch (IOException e) {
-    			// TODO Auto-generated catch block
+    				//Address address=addresses.get(0);    				    				
+    				//Toast.makeText(context, addresses.get(0).getPostalCode(), Toast.LENGTH_SHORT).show();
+    				return addresses.get(0);
+    			}    				
+    		} catch (Exception e) {
     			System.err.println("EXCEPCION");
     		}
-    	}
-    	else
-    		result="Servicio no disponible";
-    	
+    	}    	
     	return result;    	
     }
     

@@ -1,0 +1,18 @@
+package com.orientatua;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class DirectionsManager {
+	private static String api="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
+	
+	public void parseJSON(String result) {
+		try {
+			JSONObject json = new JSONObject(result);
+			
+		} catch (JSONException e) {
+			
+		}
+		
+	}
+}

@@ -1,6 +1,7 @@
 package com.orientatua;
 
 import java.io.BufferedInputStream;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,10 +16,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
+import java.lang.reflect.Type;
 
 public class DirectionsManager {
 	private static String key="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
@@ -35,10 +40,16 @@ public class DirectionsManager {
 			request.execute(address1,address2);
 			String result=request.get();
 			
-			if(result!=null)
-				Log.i("Result",result);
-			else
-				Log.i("Result","NULL");
+			if(result!=null) {
+				if(parseJSON(result))
+					Log.i("Result",result);
+				else 
+					Log.i("Result","NULL");
+			}
+			else {
+				Log.i("Result","NULL");				
+			}
+			return result;
 						
 		} catch (InterruptedException e) {		
 			e.printStackTrace();
@@ -50,20 +61,22 @@ public class DirectionsManager {
 	}
 	
 	public boolean parseJSON(String result) {
-		try {
-			JSONObject json = new JSONObject(result);
-			String status=json.getString("status");
+		//try {
+			//JSONObject json = new JSONObject(result);
 			
-			if(status.equals("OK")) {
-				
+			Gson gson = new Gson();
+            Type collectionType = new TypeToken<Direction>(){}.getType();
+			Direction direction=gson.fromJson(result, collectionType);
+			
+			if(direction.getStatus().equals("OK")) {				
 				return true;
 			}
 			else
 				return false;
 			
-		} catch (JSONException e) {
+		/*} catch (JSONException e) {
 			return false;
-		}
+		}*/
 		
 	}
 	

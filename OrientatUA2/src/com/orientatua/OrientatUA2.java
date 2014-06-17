@@ -129,8 +129,14 @@ public class OrientatUA2 extends Activity {
 		manager.waitSpeaking();
 		
 		float results[]= new float[3];		
-		ArrayList<String> distance=new ArrayList<String>();
-		String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante EspaÃ±a", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante EspaÃ±a");
+		ArrayList<String> distance=new ArrayList<String>();				
+		
+		Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
+		Address address2=gps.getCoordinates("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España");
+		
+		//String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
+		String res=directions.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
+		Toast.makeText(getApplicationContext(), res, Toast.LENGTH_LONG).show();
 		
 		//Parte real, comentada para probar la request
 		/*Location current=gps.getCurrentLocation();

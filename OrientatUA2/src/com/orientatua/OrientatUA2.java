@@ -135,8 +135,7 @@ public class OrientatUA2 extends Activity {
 		Address address2=gps.getCoordinates("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España");
 		
 		//String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
-		String res=directions.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
-		Toast.makeText(getApplicationContext(), res, Toast.LENGTH_LONG).show();
+		directions.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
 		
 		//Parte real, comentada para probar la request
 		/*Location current=gps.getCurrentLocation();

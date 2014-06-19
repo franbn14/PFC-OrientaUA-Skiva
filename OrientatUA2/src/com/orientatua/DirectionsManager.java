@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.orientatua.direction.Direction;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -41,8 +42,9 @@ public class DirectionsManager {
 			String result=request.get();
 			
 			if(result!=null) {
+				Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
 				if(parseJSON(result))
-					Log.i("Result",result);
+					Toast.makeText(context,"Bien", Toast.LENGTH_SHORT).show();
 				else 
 					Log.i("Result","NULL");
 			}
@@ -68,7 +70,14 @@ public class DirectionsManager {
             Type collectionType = new TypeToken<Direction>(){}.getType();
 			Direction direction=gson.fromJson(result, collectionType);
 			
-			if(direction.getStatus().equals("OK")) {				
+			if(direction.getStatus().equals("OK")) { //El status lo reconoce
+				
+				if(direction.getRoutes()==null) //Fallo con routes
+					Toast.makeText(context, "Vacio", Toast.LENGTH_SHORT).show();
+				else
+					Toast.makeText(context, "No vacio", Toast.LENGTH_SHORT).show();
+				
+			Toast.makeText(context,direction.getRoutes().get(0).getLegs().get(0).getSteps().get(0).getInstruction(),Toast.LENGTH_SHORT).show();
 				return true;
 			}
 			else

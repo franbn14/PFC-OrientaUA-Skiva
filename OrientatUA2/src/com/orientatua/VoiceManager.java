@@ -1,5 +1,6 @@
 package com.orientatua;
 
+import android.R.color;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,9 @@ public class VoiceManager extends Activity  {
 	private SpeechRecognizer recognizer;
 	private TextToSpeech speaker;
 	private Context context;
+	private ArrayList<String> results;
+	private int counter;
+	private int type;
 	
 	private static final int REQUEST_CODE = 1234;
 	
@@ -78,8 +82,45 @@ public class VoiceManager extends Activity  {
 		} while(speaking);
 	}
 	
+	public void setResults(ArrayList<String> list) {
+		if(results==null) {
+			results=new ArrayList<String>(list);
+		}				
+	}
 	
-	public void startVoiceRecognition()
+	public String getResult() {
+		String current;
+		
+		if(counter<results.size() && counter<=5) {
+			current=results.get(counter);
+			counter++;
+			return current;
+		}
+		else
+			return null;		
+	}
+	
+	public void resetResults() {
+		if(results!=null) {
+			results.clear();
+			results=null;
+			counter=0;
+		}		
+	}
+	
+	public void setCounter(int value) {
+		counter=value;
+	}
+	
+	public int getType() {
+		return type;
+	}
+	
+	public void setType(int value) {
+		type=value;
+	}
+		
+	/*public void startVoiceRecognition()
 	{
 		//waitSpeaking();
 		Toast.makeText( context, "Start", Toast.LENGTH_SHORT ).show();
@@ -105,13 +146,7 @@ public class VoiceManager extends Activity  {
 	        for(String word: matches) {	        	
 	        	if(word.toLowerCase(Locale.getDefault()).contains("donde estoy"))
 	        		speaker.speak("¿Dónde estoy?", TextToSpeech.QUEUE_FLUSH, null);
-	        		//getCurrentLocation();
-	        	
-	        	/*else if(word.toLowerCase(Locale.getDefault()).contains("ir a destino"))
-	        		getRoute();
-	        	
-	        	else if(word.equalsIgnoreCase("Salir"))
-	        		finish();*/	        	
+	        		        	
 	        }
 	    }
 	    else {
@@ -160,10 +195,7 @@ public class VoiceManager extends Activity  {
 		@Override
 		public void onResults(Bundle results) {
 			ArrayList<String> matches = results.getStringArrayList(RecognizerIntent.EXTRA_RESULTS);
-			/*ListView wordsList;
-
-	        wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,matches));*/	     
-	        
+			
 	        for(String word: matches) {	        	
 	        	if(word.toLowerCase(Locale.getDefault()).contains("donde estoy"))
 	        		speak("Donde estoy");
@@ -189,5 +221,5 @@ public class VoiceManager extends Activity  {
 			
 		}
 		
-	}
+	}*/
 }

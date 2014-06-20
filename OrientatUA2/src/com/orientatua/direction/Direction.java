@@ -9,12 +9,6 @@ public class Direction {
 	private String status;
 	private ArrayList<Route> routes;	
 	
-	/*public Direction() {
-		routes=new ArrayList<Route>();
-	}
-	
-	*/
-	
 	public void setStatus(String status) {
 		this.status=status;
 	}

@@ -133,36 +133,24 @@ public class OrientatUA2 extends Activity {
 		float results[]= new float[3];		
 		ArrayList<String> distance=new ArrayList<String>();				
 		
-		Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
-		Address address2=gps.getCoordinates("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España");
+		/*Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
+		Address address2=gps.getCoordinates("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España");*/
 		
 		//String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante Espa�a", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante Espa�a");
-		directioner.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
+		//directioner.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
 		
 		//Parte real, comentada para probar la request
-		/*Location current=gps.getCurrentLocation();
+		Location current=gps.getCurrentLocation();
 		//String address=gps.getAddress(gps.getCurrentLocation().getLatitude(), gps.getCurrentLocation().getLongitude());//gps.getCoordinates("Plaza Santa Faz, 03690 San Vicente del Raspeig, Alicante");
-		Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
-		
-		
-		
+		Address address=gps.getCoordinates("Universidad de Alicante, Alicante, España");
+					
 		if(address!=null) {
 			distance.add("Address ok");
-			//distance.add(gps.getCurrentLocation().getLatitude()+","+gps.getCurrentLocation().getLongitude());
-			distance.add(address.getLatitude()+","+address.getLongitude());
-			//distance.add(gps.getAddress(current.getLatitude(), current.getLongitude()));
-			Location.distanceBetween(gps.getCurrentLocation().getLatitude(), gps.getCurrentLocation().getLongitude(), address.getLatitude(), address.getLongitude(), results);			
-		
-			if(results!=null && results.length>0) {				
-				for(int i=0; i<results.length; i++)
-					distance.add(results[i]+"");		
-			}		
-			String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España", address.toString());
-			distance.add(error);
+			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());		
 			
 		}
 		else
-			distance.add("Address null");*/
+			distance.add("Address null");
 		
 		wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,distance));
 	}

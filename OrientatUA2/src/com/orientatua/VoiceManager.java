@@ -73,6 +73,7 @@ public class VoiceManager extends Activity  {
 	
 	public void speak(String message) {
 		speaker.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+		waitSpeaking();			
 	}
 	
 	public void waitSpeaking() {

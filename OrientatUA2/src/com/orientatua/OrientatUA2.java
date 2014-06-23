@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.orientatua.direction.Step;
 import com.orientatua2.R;
 
 import android.location.Address;
@@ -29,7 +30,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 public class OrientatUA2 extends Activity {
 	private GPSManager gps;	
 	private VoiceManager voicer;
-	private DirectionsManager directions;
+	private DirectionManager directioner;
 	
 	private static final int REQUEST_CODE = 1234;
 	private ListView wordsList;
@@ -41,7 +42,7 @@ public class OrientatUA2 extends Activity {
 		setContentView(R.layout.activity_main);
 				
 		voicer=VoiceManager.getInstance(OrientatUA2.this);
-		voicer.speak("Bienvenido, ¿qué desea hacer?");
+		voicer.speak("Bienvenido, Â¿quÃ© desea hacer?");
 		voicer.waitSpeaking();
 		gps = new GPSManager(OrientatUA2.this);
 		
@@ -53,8 +54,8 @@ public class OrientatUA2 extends Activity {
 	    if (activities.size() == 0)
 	    {
 	        btSpeak.setEnabled(false);	        
-	    	Toast.makeText(getApplicationContext(), "Servicio de micrófono desactivado", Toast.LENGTH_LONG).show();
-	    	voicer.speak("Micrófono desactivado");			
+	    	Toast.makeText(getApplicationContext(), "Servicio de micrï¿½fono desactivado", Toast.LENGTH_LONG).show();
+	    	voicer.speak("Micrï¿½fono desactivado");			
 	    }		
 	    else {
 	    	voicer.setType(0);
@@ -94,8 +95,7 @@ public class OrientatUA2 extends Activity {
 	}
 	
 	private void startVoiceRecognitionActivity() //0 general, 1 destino
-	{
-		voicer.waitSpeaking();			
+	{		
 		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 	    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 	    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voice recognition Demo...");	    
@@ -127,17 +127,17 @@ public class OrientatUA2 extends Activity {
 	}
 	
 	public void getRoute() {	
-		directions=new DirectionsManager(getApplicationContext());
+		directioner=new DirectionManager(getApplicationContext());
 		
 		
 		float results[]= new float[3];		
 		ArrayList<String> distance=new ArrayList<String>();				
 		
-		Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
-		Address address2=gps.getCoordinates("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España");
+		Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante EspaÃ±a");
+		Address address2=gps.getCoordinates("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante EspaÃ±a");
 		
-		//String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
-		directions.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
+		//String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante Espaï¿½a", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante Espaï¿½a");
+		directioner.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
 		
 		//Parte real, comentada para probar la request
 		/*Location current=gps.getCurrentLocation();
@@ -167,11 +167,12 @@ public class OrientatUA2 extends Activity {
 		wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,distance));
 	}
 	
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{	
 		int type=voicer.getType();
-		Toast.makeText(getApplicationContext(), "Tipo:"+type, Toast.LENGTH_SHORT).show();
+		String answer;				
 		
 	    if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
 	    {	        
@@ -182,7 +183,7 @@ public class OrientatUA2 extends Activity {
 	        	case 0: //Ordenes generales
 	        			voicer.resetResults();
 	        			for(String word: matches) {	        	
-				        	if(word.toLowerCase(Locale.getDefault()).contains("donde estoy") || word.toLowerCase(Locale.getDefault()).contains("dónde estoy"))
+				        	if(word.toLowerCase(Locale.getDefault()).contains("donde estoy") || word.toLowerCase(Locale.getDefault()).contains("dï¿½nde estoy"))
 				        		getCurrentLocation();
 				        	
 				        	else if(word.toLowerCase(Locale.getDefault()).contains("ir a destino")) {				        		
@@ -202,7 +203,7 @@ public class OrientatUA2 extends Activity {
 	        			destination=voicer.getResult();	  
 	        			
 	        			if(destination!=null) {	        			
-		        			voicer.speak("¿Ha dicho "+destination+"?");
+		        			voicer.speak("Â¿Ha dicho "+destination+"?");
 		        			voicer.setType(2);
 		        			startVoiceRecognitionActivity();
 	        			}
@@ -217,9 +218,9 @@ public class OrientatUA2 extends Activity {
 	        			break;
 	        			
 	        	case 2: //Confirmacion de destino
-	        			String answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
+	        			answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
 	        			
-	        			if(answer.toLowerCase(Locale.getDefault()).contains("sí") || answer.toLowerCase(Locale.getDefault()).contains("si")) 
+	        			if(answer.toLowerCase(Locale.getDefault()).contains("sÃ­") || answer.toLowerCase(Locale.getDefault()).contains("si")) 
 	        				getRoute();	        			
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("no")) {
 	        				voicer.setType(1);
@@ -227,15 +228,32 @@ public class OrientatUA2 extends Activity {
 	        			}
 	        			break;
 	        			
+	        	case 3:
+		        		answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
+	        			
+	        			if(answer.toLowerCase(Locale.getDefault()).contains("siguiente")) {//Siguiente indicaciÃ³n
+	        				answer=directioner.currentIndication();
+	        				directioner.nextIndex();
+	        				
+	        				voicer.speak(answer);
+	        			}	        			
+	        			else if(answer.toLowerCase(Locale.getDefault()).contains("repetir")) { //Repetir indicaciÃ³n actual
+	        				answer=dirctioner.currentIndication();
+	        				voicer.speak(answer);
+	        			}
+	        			else if(answer.toLowerCase(Locale.getDefault()).contains("salir")) { //Salir de la aplicaciÃ³n
+	        				finish();	        				
+	        			} 
+	        			break;
+	        			
 	        }
 	    }
-	    else {
-	    	Toast.makeText(getApplicationContext(), "Code: "+resultCode, Toast.LENGTH_SHORT).show();
+	    else {	    	
 	    	voicer.speak("No se ha podido reconocer el destino, por favor, repita. O diga Terminar.");
 	    	voicer.setType(1);
 	    	startVoiceRecognitionActivity();
 	    }
 	    
 	    super.onActivityResult(requestCode, resultCode, data);	
-	}
+	}		
 }

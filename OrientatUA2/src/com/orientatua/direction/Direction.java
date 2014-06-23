@@ -24,4 +24,8 @@ public class Direction {
 	public void setRoutes(ArrayList<Route> routes) {
 		this.routes = routes;
 	}
+	
+	public ArrayList<Step> getSteps() {
+		return routes.get(0).getLegs().get(0).getSteps();
+	}
 }

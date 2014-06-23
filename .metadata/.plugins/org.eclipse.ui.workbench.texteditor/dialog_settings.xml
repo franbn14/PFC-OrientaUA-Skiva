@@ -3,18 +3,19 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="285" key="DIALOG_WIDTH"/>
 		<item value="250" key="DIALOG_Y_ORIGIN"/>
-		<item value="421" key="DIALOG_HEIGHT"/>
 		<item value="824" key="DIALOG_X_ORIGIN"/>
+		<item value="421" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="true" key="isRegEx"/>
 		<item value="false" key="casesensitive"/>
+		<item value="true" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="SystemService" key="selection"/>
+		<item value="Code" key="selection"/>
 		<list key="findhistory">
+			<item value="code"/>
 			<item value="systemservice"/>
 			<item value="systemservic"/>
 			<item value="system"/>
@@ -22,7 +23,6 @@
 			<item value="servicio"/>
 			<item value="tts"/>
 			<item value=".tts.);"/>
-			<item value="servicio de"/>
 		</list>
 		<list key="replacehistory">
 			<item value="//tts."/>

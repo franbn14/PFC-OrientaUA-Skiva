@@ -18,24 +18,27 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.orientatua.direction.Direction;
+import com.orientatua.direction.*;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 import java.lang.reflect.Type;
+import android.text.Html;
 
-public class DirectionsManager {
+public class DirectionManager {
 	private static String key="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
-	private List<Direction> directions;
+	private Direction direction;
 	private Context context;
+	private String destination;
+	private int index;	
 	
-	public DirectionsManager(Context _context) {
+	public DirectionManager(Context _context) {
 		context=_context;
 	}
 	
-	public String makeRequest(String address1, String address2) {
+	public void makeRequest(String address1, String address2) {
 		try {
 			RequestTask request=new RequestTask();
 			request.execute(address1,address2);
@@ -44,22 +47,25 @@ public class DirectionsManager {
 			if(result!=null) {
 				Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
 				if(parseJSON(result))
-					Toast.makeText(context,"Bien", Toast.LENGTH_SHORT).show();
+					Toast.makeText(context,"JSON bien", Toast.LENGTH_SHORT).show();
 				else 
 					Log.i("Result","NULL");
 			}
 			else {
 				Log.i("Result","NULL");				
-			}
-			return result;
-						
+			}									
 		} catch (InterruptedException e) {		
 			e.printStackTrace();
 		} catch (ExecutionException e) {			
 			e.printStackTrace();
 		}
-		
-		return "";
+	}
+	public Direction getDirection() {
+		return direction;
+	}
+	
+	public void setDestination(String destination) {
+		this.destination=destination;
 	}
 	
 	public boolean parseJSON(String result) {
@@ -89,6 +95,23 @@ public class DirectionsManager {
 		
 	}
 	
+	public String currentIndication() {
+		String indication="";
+		
+		if(index<direction.getSteps().size()) {			
+			indication=Html.fromHtml(direction.getSteps().get(index).getInstruction()).toString();
+			indication+=" y continúa "+direction.getSteps().get(index).getDistance().getValue()+" metros";			
+		}
+		else
+			indication="Ha llegado a su destino";
+		
+		return indication;
+	}	
+	
+	public void nextIndex() {
+		index++;
+	}
+	
 	private class RequestTask extends AsyncTask<String, Void, String> {
 
 		@Override
@@ -98,6 +121,7 @@ public class DirectionsManager {
 			str+="&destination="+params[1];
 			str+="&key="+key;
 			str+="&mode=walking";
+			str+="&language=es";
 			//str="https://maps.googleapis.com/maps/api/directions/json?origin=Calle%20San%20Pablo%2013%2003690%20San%20Vicente%20del%20RaspeigAlicanteEspa%C3%B1a&destination=Plaza%20Santa%20Faz03690SanVicentedelRaspeig%20Alicante%20Espa%C3%B1a&mode=walking";
 			Log.i("URL",str);
 			try {

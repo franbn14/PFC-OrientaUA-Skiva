@@ -238,7 +238,7 @@ public class OrientatUA2 extends Activity {
 	        				voicer.speak(answer);
 	        			}	        			
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("repetir")) { //Repetir indicación actual
-	        				answer=directioner.currentIndication();
+	        				answer=dirctioner.currentIndication();
 	        				voicer.speak(answer);
 	        			}
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("salir")) { //Salir de la aplicación

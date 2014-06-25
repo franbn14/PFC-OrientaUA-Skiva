@@ -25,8 +25,7 @@ public class IndicationThread extends Thread {
 	public void run() {
 		while(running) {
 			try {
-				
-				
+								
 				Thread.sleep(timer*1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

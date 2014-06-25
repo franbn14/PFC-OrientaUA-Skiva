@@ -74,8 +74,7 @@ public class DirectionManager {
             Type collectionType = new TypeToken<Direction>(){}.getType();
 			direction=gson.fromJson(result, collectionType);
 			
-			if(direction.getStatus().equals("OK")) { //El status lo reconoce
-				
+			if(direction.getStatus().equals("OK")) { //El status lo reconoce				
 				if(direction.getRoutes()==null) //Fallo con routes
 					Toast.makeText(context, "Vacio", Toast.LENGTH_SHORT).show();
 				else
@@ -93,11 +92,23 @@ public class DirectionManager {
 		
 	}
 	
-	public String getIndication(int hopedIndex) {
+	public String getIndication(int hopedIndex, Orientation orientation) {
 		String indication="";
-				
+		
 		if(hopedIndex<direction.getSteps().size()) {			
-			indication=Html.fromHtml(direction.getSteps().get(hopedIndex).getInstruction()).toString();
+			indication=Html.fromHtml(direction.getSteps().get(hopedIndex).getInstruction()).toString();			
+			Toast.makeText(context, "Indicacion "+indication, Toast.LENGTH_SHORT).show();
+			String[] words=indication.split("\\s+");
+						
+			for(String word: words) {
+				if(Orientation.contains(word)) {
+					
+					//Probar valueof, comprobar a pelo un valor del enum 
+					indication=checkPosition(orientation, Orientation.valueOf(word));
+					break;
+				}
+			}
+			Toast.makeText(context, "Despues: "+indication, Toast.LENGTH_SHORT).show();
 			indication+=" y continúa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
 		}
 		else if(hopedIndex==index)
@@ -114,6 +125,286 @@ public class DirectionManager {
 	
 	public void nextIndex() {
 		index++;
+	}
+	
+	public String checkPosition(Orientation user, Orientation indication) {
+		String movement="";
+
+		switch(indication) {
+			case NORTH: 
+				return checkNorth(indication).toString();
+				
+			case NORTH_EAST: 
+				return checkNorthEast(indication).toString();
+			
+			case EAST: 
+				return checkEast(indication).toString();
+				
+			case SOUTH_EAST: 
+				return checkSouthEast(indication).toString();
+				
+			case SOUTH: 
+				return checkSouth(indication).toString();
+				
+			case SOUTH_WEST: 
+				return checkSouthWest(indication).toString();
+				
+			case WEST: 
+				return checkWest(indication).toString();
+				
+			case NORTH_WEST: 
+				return checkNorthWest(indication).toString();
+		}
+		
+		return movement;
+	}
+	
+	public Orientation checkNorth(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.STAY;
+				
+			case NORTH_EAST:
+				return Orientation.LIGHT_RIGHT;
+				
+			case EAST:
+				return Orientation.RIGHT;
+				
+			case SOUTH_EAST:
+				return Orientation.TURN_AND_LEFT;
+				
+			case SOUTH:
+				return Orientation.TURN;
+				
+			case SOUTH_WEST:
+				return Orientation.TURN_AND_RIGHT;
+				
+			case WEST:
+				return Orientation.LEFT;
+				
+			case NORTH_WEST:
+				return Orientation.LIGHT_LEFT;
+			
+			default:
+				return Orientation.ERROR;
+		}		
+	}
+	
+	public Orientation checkNorthEast(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.LIGHT_LEFT;
+				
+			case NORTH_EAST:
+				return Orientation.STAY;
+				
+			case EAST:
+				return Orientation.LIGHT_RIGHT;
+				
+			case SOUTH_EAST:
+				return Orientation.RIGHT;
+				
+			case SOUTH:
+				return Orientation.TURN_AND_LEFT;
+				
+			case SOUTH_WEST:
+				return Orientation.TURN;
+				
+			case WEST:
+				return Orientation.TURN_AND_RIGHT;
+				
+			case NORTH_WEST:
+				return Orientation.LEFT;
+			
+			default:
+				return Orientation.ERROR;
+		}		
+	}
+	
+	public Orientation checkEast(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.LEFT;
+				
+			case NORTH_EAST:
+				return Orientation.LIGHT_LEFT;
+				
+			case EAST:
+				return Orientation.STAY;
+				
+			case SOUTH_EAST:
+				return Orientation.LIGHT_RIGHT;
+				
+			case SOUTH:
+				return Orientation.RIGHT;
+				
+			case SOUTH_WEST:
+				return Orientation.TURN_AND_LEFT;
+				
+			case WEST:
+				return Orientation.TURN;
+				
+			case NORTH_WEST:
+				return Orientation.TURN_AND_RIGHT;
+			
+			default:
+				return Orientation.ERROR;
+		}		
+	}
+	
+	public Orientation checkSouthEast(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.TURN_AND_RIGHT;
+				
+			case NORTH_EAST:
+				return Orientation.LEFT;
+				
+			case EAST:
+				return Orientation.LIGHT_LEFT;
+				
+			case SOUTH_EAST:
+				return Orientation.STAY;
+				
+			case SOUTH:
+				return Orientation.LIGHT_RIGHT;
+				
+			case SOUTH_WEST:
+				return Orientation.RIGHT;
+				
+			case WEST:
+				return Orientation.TURN_AND_LEFT;
+				
+			case NORTH_WEST:
+				return Orientation.TURN;
+			
+			default:
+				return Orientation.ERROR;
+		}		
+	}
+	
+	public Orientation checkSouth(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.TURN;
+				
+			case NORTH_EAST:
+				return Orientation.TURN_AND_RIGHT;
+				
+			case EAST:
+				return Orientation.LEFT;
+				
+			case SOUTH_EAST:
+				return Orientation.LIGHT_LEFT;
+				
+			case SOUTH:
+				return Orientation.STAY;
+				
+			case SOUTH_WEST:
+				return Orientation.LIGHT_RIGHT;
+				
+			case WEST:
+				return Orientation.RIGHT;
+				
+			case NORTH_WEST:
+				return Orientation.TURN_AND_LEFT;
+			
+			default:
+				return Orientation.ERROR;
+		}		
+	}
+	
+	public Orientation checkSouthWest(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.TURN_AND_LEFT;
+				
+			case NORTH_EAST:
+				return Orientation.TURN;
+				
+			case EAST:
+				return Orientation.TURN_AND_RIGHT;
+				
+			case SOUTH_EAST:
+				return Orientation.LEFT;
+				
+			case SOUTH:
+				return Orientation.LIGHT_LEFT;
+				
+			case SOUTH_WEST:
+				return Orientation.STAY;
+				
+			case WEST:
+				return Orientation.LIGHT_RIGHT;
+				
+			case NORTH_WEST:
+				return Orientation.RIGHT;
+			
+			default:
+				return Orientation.ERROR;
+		}		
+	}
+	
+	public Orientation checkWest(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.RIGHT;
+				
+			case NORTH_EAST:
+				return Orientation.TURN_AND_LEFT;
+				
+			case EAST:
+				return Orientation.TURN;
+				
+			case SOUTH_EAST:
+				return Orientation.TURN_AND_RIGHT;
+				
+			case SOUTH:
+				return Orientation.LEFT;
+				
+			case SOUTH_WEST:
+				return Orientation.LIGHT_LEFT;
+				
+			case WEST:
+				return Orientation.STAY;
+				
+			case NORTH_WEST:
+				return Orientation.LIGHT_RIGHT;
+			
+			default:
+				return Orientation.ERROR;
+		}		
+	}
+	
+	public Orientation checkNorthWest(Orientation orientation) {
+		switch (orientation) {
+			case NORTH:
+				return Orientation.LIGHT_RIGHT;
+				
+			case NORTH_EAST:
+				return Orientation.RIGHT;
+				
+			case EAST:
+				return Orientation.TURN_AND_LEFT;
+				
+			case SOUTH_EAST:
+				return Orientation.TURN;
+				
+			case SOUTH:
+				return Orientation.TURN_AND_RIGHT;
+				
+			case SOUTH_WEST:
+				return Orientation.LEFT;
+				
+			case WEST:
+				return Orientation.LIGHT_LEFT;
+				
+			case NORTH_WEST:
+				return Orientation.STAY;
+			
+			default:
+				return Orientation.ERROR;
+		}		
 	}
 	
 	private class RequestTask extends AsyncTask<String, Void, String> {

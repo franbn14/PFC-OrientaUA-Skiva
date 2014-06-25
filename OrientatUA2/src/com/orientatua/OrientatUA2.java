@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.orientatua.direction.Compass;
 import com.orientatua.direction.Step;
 import com.orientatua2.R;
 
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
@@ -35,35 +37,21 @@ public class OrientatUA2 extends Activity {
 	private static final int REQUEST_CODE = 1234;
 	private ListView wordsList;
 	private String destination;
+	private Compass compass; 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 				
-		voicer=VoiceManager.getInstance(OrientatUA2.this);
-		voicer.speak("Bienvenido, ¿qué desea hacer?");
-		voicer.waitSpeaking();
+		voicer=VoiceManager.getInstance(OrientatUA2.this);		
 		gps = new GPSManager(OrientatUA2.this);
+		compass=new Compass(getApplicationContext(), (SensorManager)getSystemService(SENSOR_SERVICE));
 		
 		Button btSpeak=(Button)findViewById(R.id.btSpeak);			
 		wordsList = (ListView) findViewById(R.id.listView1);
 		
-		PackageManager pm = getPackageManager();
-	    List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
-	    if (activities.size() == 0)
-	    {
-	        btSpeak.setEnabled(false);	        
-	    	Toast.makeText(getApplicationContext(), "Servicio de micrï¿½fono desactivado", Toast.LENGTH_LONG).show();
-	    	voicer.speak("Micrï¿½fono desactivado");			
-	    }		
-	    else {
-	    	voicer.setType(0);
-	    	startVoiceRecognitionActivity();
-	    }
-	    
-	    btSpeak.setOnClickListener(new View.OnClickListener() {
-			
+		btSpeak.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				voicer.setType(0);
@@ -91,7 +79,23 @@ public class OrientatUA2 extends Activity {
 			public void onClick(View v) {						
 				getCurrentLocation();				
 			}
-		});		
+		});
+		
+		PackageManager pm = getPackageManager();
+	    List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+	    if (activities.size() == 0)
+	    {
+	        btSpeak.setEnabled(false);	        
+	    	Toast.makeText(getApplicationContext(), "Servicio de micrï¿½fono desactivado", Toast.LENGTH_LONG).show();
+	    	voicer.speak("Micrï¿½fono desactivado");			
+	    }		
+	    else {
+	    	voicer.speak("Bienvenido, ¿qué desea hacer?");
+			voicer.waitSpeaking();
+			
+	    	voicer.setType(0);
+	    	startVoiceRecognitionActivity();
+	    }	    	    	
 	}
 	
 	private void startVoiceRecognitionActivity() //0 general, 1 destino
@@ -137,14 +141,16 @@ public class OrientatUA2 extends Activity {
 		Address address=gps.getCoordinates(destination+" Universidad de Alicante, Alicante, España");
 					
 		if(address!=null) {
+			
 			distance.add("Address ok");
-			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());							
-			voicer.speak(directioner.getIndication(directioner.getIndex()));
-			voicer.setType(3);
-			startVoiceRecognitionActivity();
+			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());			
+			voicer.speak(directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint()));
+			/*voicer.setType(3);
+			startVoiceRecognitionActivity();*/
+			Toast.makeText(getApplicationContext(), "Address OK", Toast.LENGTH_SHORT).show();
 		}
 		else
-			distance.add("Address null");
+			Toast.makeText(getApplicationContext(), "Address null", Toast.LENGTH_SHORT).show();
 		
 		wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,distance));
 	}
@@ -212,13 +218,14 @@ public class OrientatUA2 extends Activity {
 	        			
 	        	case 3:
 		        		answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
-	        			
+		        		Toast.makeText(getApplicationContext(), "Compass: "+compass.getCardinalPoint(), Toast.LENGTH_SHORT).show();
+		        		
 	        			if(answer.toLowerCase(Locale.getDefault()).contains("siguiente")) {//Siguiente indicaciÃ³n	        				
-	        				answer=directioner.getIndication(directioner.getIndex()+1);	        				        				
+	        				answer=directioner.getIndication(directioner.getIndex()+1,compass.getCardinalPoint());	        				        				
 	        				voicer.speak(answer);
 	        			}	        			
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("repetir")) { //Repetir indicaciÃ³n actual
-	        				answer=directioner.getIndication(directioner.getIndex());
+	        				answer=directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint());
 	        				voicer.speak(answer);
 	        			}
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("salir")) { //Salir de la aplicaciÃ³n	        				

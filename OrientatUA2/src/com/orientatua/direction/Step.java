@@ -4,6 +4,7 @@ public class Step {
 	private Unit distance;
 	private Unit duration;
 	private String html_instructions;
+	private StepLocation end_location;
 
 	public Unit getDistance() {
 		return distance;
@@ -20,7 +21,12 @@ public class Step {
 	public String getInstruction() {
 		return html_instructions;
 	}
+	
 	public void setInsruction(String html_insructions) {
 		this.html_instructions = html_insructions;
+	}
+			
+	public StepLocation getLocation() {
+		return end_location;
 	}
 }

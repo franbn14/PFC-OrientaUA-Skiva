@@ -29,7 +29,7 @@ import android.text.Html;
 
 public class DirectionManager {
 	private static String key="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
-	private Direction direction;
+	public Direction direction;
 	private Context context;
 	private String destination;
 	private int index;	
@@ -46,10 +46,8 @@ public class DirectionManager {
 			
 			if(result!=null) {
 				Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
-				if(parseJSON(result))
-					Toast.makeText(context,"JSON bien", Toast.LENGTH_SHORT).show();
-				else 
-					Log.i("Result","NULL");
+				if(!parseJSON(result))  
+					Toast.makeText(context, "Result null", Toast.LENGTH_SHORT).show();
 			}
 			else {
 				Log.i("Result","NULL");				
@@ -74,7 +72,7 @@ public class DirectionManager {
 			
 			Gson gson = new Gson();
             Type collectionType = new TypeToken<Direction>(){}.getType();
-			Direction direction=gson.fromJson(result, collectionType);
+			direction=gson.fromJson(result, collectionType);
 			
 			if(direction.getStatus().equals("OK")) { //El status lo reconoce
 				
@@ -95,18 +93,24 @@ public class DirectionManager {
 		
 	}
 	
-	public String currentIndication() {
+	public String getIndication(int hopedIndex) {
 		String indication="";
-		
-		if(index<direction.getSteps().size()) {			
-			indication=Html.fromHtml(direction.getSteps().get(index).getInstruction()).toString();
-			indication+=" y continÃºa "+direction.getSteps().get(index).getDistance().getValue()+" metros";			
+				
+		if(hopedIndex<direction.getSteps().size()) {			
+			indication=Html.fromHtml(direction.getSteps().get(hopedIndex).getInstruction()).toString();
+			indication+=" y continúa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
 		}
-		else
+		else if(hopedIndex==index)
 			indication="Ha llegado a su destino";
+		else
+			indication="El próximo punto es su destino";
 		
 		return indication;
 	}	
+	
+	public int getIndex() {
+		return index;
+	}
 	
 	public void nextIndex() {
 		index++;

@@ -106,7 +106,7 @@ public class VoiceManager extends Activity  {
 			results.clear();
 			results=null;
 			counter=0;
-		}		
+		}	
 	}
 	
 	public void setCounter(int value) {

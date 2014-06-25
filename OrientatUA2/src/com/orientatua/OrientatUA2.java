@@ -42,7 +42,7 @@ public class OrientatUA2 extends Activity {
 		setContentView(R.layout.activity_main);
 				
 		voicer=VoiceManager.getInstance(OrientatUA2.this);
-		voicer.speak("Bienvenido, ¿qué desea hacer?");
+		voicer.speak("Bienvenido, �qu� desea hacer?");
 		voicer.waitSpeaking();
 		gps = new GPSManager(OrientatUA2.this);
 		
@@ -132,22 +132,16 @@ public class OrientatUA2 extends Activity {
 		
 		float results[]= new float[3];		
 		ArrayList<String> distance=new ArrayList<String>();				
-		
-		/*Address address=gps.getCoordinates("Plaza Santa Faz 03690 San Vicente del Raspeig Alicante España");
-		Address address2=gps.getCoordinates("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante España");*/
-		
-		//String error=directions.makeRequest("Calle San Pablo 13 03690 San Vicente del Raspeig Alicante Espa�a", "Plaza Santa Faz 03690 San Vicente del Raspeig Alicante Espa�a");
-		//directioner.makeRequest(address.getLatitude()+","+address.getLongitude(),address2.getLatitude()+","+address2.getLongitude());
-		
-		//Parte real, comentada para probar la request
-		Location current=gps.getCurrentLocation();
-		//String address=gps.getAddress(gps.getCurrentLocation().getLatitude(), gps.getCurrentLocation().getLongitude());//gps.getCoordinates("Plaza Santa Faz, 03690 San Vicente del Raspeig, Alicante");
-		Address address=gps.getCoordinates("Universidad de Alicante, Alicante, España");
+				
+		Location current=gps.getCurrentLocation();		
+		Address address=gps.getCoordinates(destination+" Universidad de Alicante, Alicante, Espa�a");
 					
 		if(address!=null) {
 			distance.add("Address ok");
-			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());		
-			
+			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());							
+			voicer.speak(directioner.getIndication(directioner.getIndex()));
+			voicer.setType(3);
+			startVoiceRecognitionActivity();
 		}
 		else
 			distance.add("Address null");
@@ -191,7 +185,7 @@ public class OrientatUA2 extends Activity {
 	        			destination=voicer.getResult();	  
 	        			
 	        			if(destination!=null) {	        			
-		        			voicer.speak("¿Ha dicho "+destination+"?");
+		        			voicer.speak("�Ha dicho "+destination+"?");
 		        			voicer.setType(2);
 		        			startVoiceRecognitionActivity();
 	        			}
@@ -208,7 +202,7 @@ public class OrientatUA2 extends Activity {
 	        	case 2: //Confirmacion de destino
 	        			answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
 	        			
-	        			if(answer.toLowerCase(Locale.getDefault()).contains("sí") || answer.toLowerCase(Locale.getDefault()).contains("si")) 
+	        			if(answer.toLowerCase(Locale.getDefault()).contains("s�") || answer.toLowerCase(Locale.getDefault()).contains("si")) 
 	        				getRoute();	        			
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("no")) {
 	        				voicer.setType(1);
@@ -219,29 +213,32 @@ public class OrientatUA2 extends Activity {
 	        	case 3:
 		        		answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
 	        			
-	        			if(answer.toLowerCase(Locale.getDefault()).contains("siguiente")) {//Siguiente indicación
-	        				answer=directioner.currentIndication();
-	        				directioner.nextIndex();
-	        				
+	        			if(answer.toLowerCase(Locale.getDefault()).contains("siguiente")) {//Siguiente indicación	        				
+	        				answer=directioner.getIndication(directioner.getIndex()+1);	        				        				
 	        				voicer.speak(answer);
 	        			}	        			
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("repetir")) { //Repetir indicación actual
-	        				answer=directioner.currentIndication();
+	        				answer=directioner.getIndication(directioner.getIndex());
 	        				voicer.speak(answer);
 	        			}
-	        			else if(answer.toLowerCase(Locale.getDefault()).contains("salir")) { //Salir de la aplicación
+	        			else if(answer.toLowerCase(Locale.getDefault()).contains("salir")) { //Salir de la aplicación	        				
 	        				finish();	        				
-	        			} 
-	        			break;
-	        			
+	        			}
+	        			voicer.setType(3);	        		    	
+        		    	startVoiceRecognitionActivity();        		    	
+	        			break;	        			
 	        }
 	    }
-	    else {	    	
-	    	voicer.speak("No se ha podido reconocer el destino, por favor, repita. O diga Terminar.");
-	    	voicer.setType(1);
+	    else {		    		    	
+	    	if(voicer.getType()!=3) {
+	    		voicer.speak("No se ha podido reconocer el destino, por favor, repita. O diga Terminar.");
+	    		voicer.setType(1);	    		
+	    	}
+	    	else
+	    		voicer.setType(3);
+	    	
 	    	startVoiceRecognitionActivity();
-	    }
-	    
+	    }	    
 	    super.onActivityResult(requestCode, resultCode, data);	
 	}		
 }

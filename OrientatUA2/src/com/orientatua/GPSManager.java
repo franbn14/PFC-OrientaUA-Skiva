@@ -96,7 +96,7 @@ public class GPSManager extends Service implements LocationListener {
 	                continue;
 	            }
 	            if (bestLocation == null || temp.getAccuracy() < bestLocation.getAccuracy()) {
-	                Log.d("found best last known location: %s", provider);
+	                //Log.d("found best last known location: %s", provider);
 	                bestLocation = temp;
 	                bestProvider=provider;
 	            }
@@ -157,7 +157,7 @@ public class GPSManager extends Service implements LocationListener {
     public String getAddress(double latitude, double longitude) {
     	if(geocoder==null)
     		geocoder=new Geocoder(context,Locale.getDefault());
-    	String result="Localización no encontrada";
+    	String result=null;
     	
     	if(Geocoder.isPresent()) { 
     		//Toast.makeText(context, "Geocoder in", Toast.LENGTH_LONG).show();
@@ -190,7 +190,7 @@ public class GPSManager extends Service implements LocationListener {
     		}
     	}
     	else {
-    		result="Servicio no disponible";
+    		result=null;
     		Log.i("GEOCODER","No presente");
     	}    		
     	

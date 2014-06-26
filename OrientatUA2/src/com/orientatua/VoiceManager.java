@@ -33,7 +33,7 @@ public class VoiceManager extends Activity  {
 	private static final int REQUEST_CODE = 1234;
 	
 	private VoiceManager(Context _context) {
-		//Inicializamos el speaker, con idioma espa�ol					
+		//Inicializamos el speaker, con idioma español					
 		context=_context;	
 		
 		speaker=new TextToSpeech(context,new OnInitListener() {
@@ -46,7 +46,7 @@ public class VoiceManager extends Activity  {
 				if (status == TextToSpeech.SUCCESS) {
 					speaker.setLanguage(Locale.getDefault());
 					
-					//speaker.speak("Bienvenido, ¿qué desea hacer?", TextToSpeech.QUEUE_FLUSH, null);	
+					speak("Bienvenido, ¿qué desea hacer?");	
 					//startVoiceRecognitionActivity(0);	
 				}
 				else

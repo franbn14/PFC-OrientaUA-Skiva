@@ -97,24 +97,22 @@ public class DirectionManager {
 		
 		if(hopedIndex<direction.getSteps().size()) {			
 			indication=Html.fromHtml(direction.getSteps().get(hopedIndex).getInstruction()).toString();			
-			Toast.makeText(context, "Indicacion "+indication, Toast.LENGTH_SHORT).show();
+			
 			String[] words=indication.split("\\s+");
-						
+			Toast.makeText(context, "User: "+orientation.getValue()+" Palabras: "+words[0]+" "+words[1]+" "+words[2]+" "+words[3], Toast.LENGTH_SHORT).show();		
 			for(String word: words) {
-				if(Orientation.contains(word)) {
-					
-					//Probar valueof, comprobar a pelo un valor del enum 
-					indication=checkPosition(orientation, Orientation.valueOf(word));
+				if(Orientation.contains(word)) {									
+					indication=checkPosition(orientation, Orientation.getValueOf(word)).toString();
 					break;
 				}
 			}
 			Toast.makeText(context, "Despues: "+indication, Toast.LENGTH_SHORT).show();
-			indication+=" y continúa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
+			indication+=" y continÃºa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
 		}
 		else if(hopedIndex==index)
 			indication="Ha llegado a su destino";
 		else
-			indication="El próximo punto es su destino";
+			indication="El prÃ³ximo punto es su destino";
 		
 		return indication;
 	}	
@@ -127,36 +125,34 @@ public class DirectionManager {
 		index++;
 	}
 	
-	public String checkPosition(Orientation user, Orientation indication) {
-		String movement="";
-
-		switch(indication) {
+	public Orientation checkPosition(Orientation user, Orientation indication) {		
+		switch(user) {
 			case NORTH: 
-				return checkNorth(indication).toString();
+				return checkNorth(indication);
 				
 			case NORTH_EAST: 
-				return checkNorthEast(indication).toString();
+				return checkNorthEast(indication);
 			
 			case EAST: 
-				return checkEast(indication).toString();
+				return checkEast(indication);
 				
 			case SOUTH_EAST: 
-				return checkSouthEast(indication).toString();
+				return checkSouthEast(indication);
 				
 			case SOUTH: 
-				return checkSouth(indication).toString();
+				return checkSouth(indication);
 				
 			case SOUTH_WEST: 
-				return checkSouthWest(indication).toString();
+				return checkSouthWest(indication);
 				
 			case WEST: 
-				return checkWest(indication).toString();
+				return checkWest(indication);
 				
 			case NORTH_WEST: 
-				return checkNorthWest(indication).toString();
+				return checkNorthWest(indication);
 		}
 		
-		return movement;
+		return Orientation.ERROR;
 	}
 	
 	public Orientation checkNorth(Orientation orientation) {
@@ -417,8 +413,8 @@ public class DirectionManager {
 			str+="&key="+key;
 			str+="&mode=walking";
 			str+="&language=es";
-			//str="https://maps.googleapis.com/maps/api/directions/json?origin=Calle%20San%20Pablo%2013%2003690%20San%20Vicente%20del%20RaspeigAlicanteEspa%C3%B1a&destination=Plaza%20Santa%20Faz03690SanVicentedelRaspeig%20Alicante%20Espa%C3%B1a&mode=walking";
-			Log.i("URL",str);
+			//str="https://maps.googleapis.com/maps/api/directions/json?origin=Calle%20San%20Pablo%2013%2003690%20San%20Vicente%20del%20RaspeigAlicanteEspa%C3%B1a&destination=Plaza%20Santa%20Faz03690SanVicentedelRaspeig%20Alicante%20Espa%C3%B1a&mode=walking&language=es";
+			
 			try {
 				URL url= new URL(str);
 	  		    HttpURLConnection connection = (HttpURLConnection) url.openConnection();

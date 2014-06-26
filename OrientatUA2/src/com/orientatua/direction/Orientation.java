@@ -39,9 +39,17 @@ public enum Orientation {
 	
 	public static boolean contains(String direction) {
 		for(Orientation orientation: Orientation.values()) {
-			if(orientation.getValue().toLowerCase(Locale.getDefault()).equals(direction))
+			if(orientation.getValue().equalsIgnoreCase(direction))
 				return true;
 		}
 		return false;
+	}
+	
+	public static Orientation getValueOf(String direction) {
+		for(Orientation value: values()) {
+			if(value.getValue().equalsIgnoreCase(direction))
+				return value;
+		}
+		return Orientation.ERROR;
 	}
 }

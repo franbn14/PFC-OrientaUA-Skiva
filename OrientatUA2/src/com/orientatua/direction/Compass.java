@@ -25,9 +25,7 @@ public class Compass implements SensorEventListener{
 	}
 	
 	public Orientation getCardinalPoint()
-    {
-		Toast.makeText(context, "Cardinal point", Toast.LENGTH_SHORT).show();		
-		
+    {				
 		if(azimut!=null) {
 			if((azimut>=0 && azimut<22.5) || (azimut<=360 && azimut>=337.5))
 	    		return Orientation.NORTH;

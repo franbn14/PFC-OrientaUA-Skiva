@@ -89,10 +89,7 @@ public class OrientatUA2 extends Activity {
 	    	Toast.makeText(getApplicationContext(), "Servicio de micrï¿½fono desactivado", Toast.LENGTH_LONG).show();
 	    	voicer.speak("Micrï¿½fono desactivado");			
 	    }		
-	    else {
-	    	voicer.speak("Bienvenido, ¿qué desea hacer?");
-			voicer.waitSpeaking();
-			
+	    else {	    			
 	    	voicer.setType(0);
 	    	startVoiceRecognitionActivity();
 	    }	    	    	
@@ -114,7 +111,9 @@ public class OrientatUA2 extends Activity {
 			if(current!=null) {
 				double latitude = current.getLatitude();
 				double longitude = current.getLongitude();
-				String address="Usted se encuentra en "+gps.getAddress(latitude,longitude);
+				String address=gps.getAddress(latitude,longitude);
+				
+				address=(address==null?address="No se ha podido encontrar su localizaciÃ³n":"Usted se encuentra en "+address);
 				
 				Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
 				Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
@@ -130,7 +129,7 @@ public class OrientatUA2 extends Activity {
 			gps.setSettings();
 	}
 	
-	public void getRoute() {	
+	public void getRoute() {			
 		directioner=new DirectionManager(getApplicationContext());
 		
 		
@@ -138,15 +137,15 @@ public class OrientatUA2 extends Activity {
 		ArrayList<String> distance=new ArrayList<String>();				
 				
 		Location current=gps.getCurrentLocation();		
-		Address address=gps.getCoordinates(destination+" Universidad de Alicante, Alicante, España");
+		Address address=gps.getCoordinates(destination+" Universidad de Alicante, Alicante, EspaÃ±a");
 					
 		if(address!=null) {
 			
 			distance.add("Address ok");
 			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());			
 			voicer.speak(directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint()));
-			/*voicer.setType(3);
-			startVoiceRecognitionActivity();*/
+			voicer.setType(3);
+			startVoiceRecognitionActivity();
 			Toast.makeText(getApplicationContext(), "Address OK", Toast.LENGTH_SHORT).show();
 		}
 		else
@@ -191,7 +190,7 @@ public class OrientatUA2 extends Activity {
 	        			destination=voicer.getResult();	  
 	        			
 	        			if(destination!=null) {	        			
-		        			voicer.speak("¿Ha dicho "+destination+"?");
+		        			voicer.speak("Â¿Ha dicho "+destination+"?");
 		        			voicer.setType(2);
 		        			startVoiceRecognitionActivity();
 	        			}
@@ -208,7 +207,7 @@ public class OrientatUA2 extends Activity {
 	        	case 2: //Confirmacion de destino
 	        			answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
 	        			
-	        			if(answer.toLowerCase(Locale.getDefault()).contains("sí") || answer.toLowerCase(Locale.getDefault()).contains("si")) 
+	        			if(answer.toLowerCase(Locale.getDefault()).contains("sÃ­") || answer.toLowerCase(Locale.getDefault()).contains("si")) 
 	        				getRoute();	        			
 	        			else if(answer.toLowerCase(Locale.getDefault()).contains("no")) {
 	        				voicer.setType(1);

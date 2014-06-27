@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.orientatua.direction.Compass;
+import com.orientatua.direction.IndicationThread;
 import com.orientatua.direction.Step;
 import com.orientatua2.R;
 
@@ -44,8 +45,8 @@ public class OrientatUA2 extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 				
-		voicer=VoiceManager.getInstance(OrientatUA2.this);		
-		gps = new GPSManager(OrientatUA2.this);
+		voicer=VoiceManager.getInstance(getApplicationContext());		
+		gps = new GPSManager(getApplicationContext());
 		compass=new Compass(getApplicationContext(), (SensorManager)getSystemService(SENSOR_SERVICE));
 		
 		Button btSpeak=(Button)findViewById(R.id.btSpeak);			
@@ -115,8 +116,8 @@ public class OrientatUA2 extends Activity {
 				
 				address=(address==null?address="No se ha podido encontrar su localización":"Usted se encuentra en "+address);
 				
-				Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
-				Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
+				//Toast.makeText(getApplicationContext(), "Coordenadas: \nLatitud: " + latitude + "\nLongitud: " + longitude, Toast.LENGTH_LONG).show();
+				//Toast.makeText(getApplicationContext(), address, Toast.LENGTH_LONG).show();
 				
 				voicer.speak(address);	
 			}						
@@ -142,14 +143,16 @@ public class OrientatUA2 extends Activity {
 		if(address!=null) {
 			
 			distance.add("Address ok");
-			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());			
+			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());
+			IndicationThread thread=new IndicationThread(gps, directioner.getDirection().getSteps().get(0), voicer, getApplicationContext());
 			voicer.speak(directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint()));
+			thread.run();
 			voicer.setType(3);
 			startVoiceRecognitionActivity();
-			Toast.makeText(getApplicationContext(), "Address OK", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(getApplicationContext(), "Address OK", Toast.LENGTH_SHORT).show();
 		}
-		else
-			Toast.makeText(getApplicationContext(), "Address null", Toast.LENGTH_SHORT).show();
+		/*else
+			Toast.makeText(getApplicationContext(), "Address null", Toast.LENGTH_SHORT).show();*/
 		
 		wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,distance));
 	}
@@ -217,7 +220,7 @@ public class OrientatUA2 extends Activity {
 	        			
 	        	case 3:
 		        		answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
-		        		Toast.makeText(getApplicationContext(), "Compass: "+compass.getCardinalPoint(), Toast.LENGTH_SHORT).show();
+		        		//Toast.makeText(getApplicationContext(), "Compass: "+compass.getCardinalPoint(), Toast.LENGTH_SHORT).show();
 		        		
 	        			if(answer.toLowerCase(Locale.getDefault()).contains("siguiente")) {//Siguiente indicación	        				
 	        				answer=directioner.getIndication(directioner.getIndex()+1,compass.getCardinalPoint());	        				        				

@@ -29,7 +29,7 @@ import android.text.Html;
 
 public class DirectionManager {
 	private static String key="AIzaSyBwu6y14fhrXhLiqNCaGD4vByhOUOtyr2Y";
-	public Direction direction;
+	private Direction direction;
 	private Context context;
 	private String destination;
 	private int index;	
@@ -107,7 +107,7 @@ public class DirectionManager {
 				}
 			}
 			Toast.makeText(context, "Despues: "+indication, Toast.LENGTH_SHORT).show();
-			indication+=" y continúa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
+			indication+=". Continúa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
 		}
 		else if(hopedIndex==index)
 			indication="Ha llegado a su destino";

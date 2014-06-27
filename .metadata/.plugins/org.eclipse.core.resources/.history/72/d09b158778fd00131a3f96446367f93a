@@ -1,0 +1,47 @@
+package com.orientatua.direction;
+
+import com.orientatua.GPSManager;
+import com.orientatua.VoiceManager;
+
+public class IndicationThread extends Thread {
+	private boolean running;
+	private long timer;
+	private Step step;		
+	private GPSManager gps;	
+	private float distance;
+	private VoiceManager voicer;
+		
+	public IndicationThread(GPSManager _gps,Step _step,VoiceManager _voicer) {
+		running=false;
+		timer=step.getDuration().getValue();
+		step=_step;
+		gps=_gps;
+		voicer=_voicer;
+	}
+	
+	
+	public void setRunning(boolean _running)  {
+		running=_running;
+	}
+	
+	public void setTimer(long _timer) {
+		timer=_timer;
+	}
+	
+	public void setStep(Step _step) {
+		step=_step;
+	}
+	
+	@Override	
+	public void run() {
+		while(running) {
+			try {
+								
+				Thread.sleep(timer*1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}

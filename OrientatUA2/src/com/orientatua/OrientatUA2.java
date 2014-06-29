@@ -1,8 +1,10 @@
 package com.orientatua;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
 
 import com.orientatua.direction.Compass;
 import com.orientatua.direction.IndicationThread;
@@ -34,6 +36,8 @@ public class OrientatUA2 extends Activity {
 	private GPSManager gps;	
 	private VoiceManager voicer;
 	private DirectionManager directioner;
+	private IndicationThread thread;
+	private Timer timer;
 	
 	private static final int REQUEST_CODE = 1234;
 	private ListView wordsList;
@@ -67,7 +71,8 @@ public class OrientatUA2 extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				finish();
+				//timer.cancel();
+        		finish();
 				
 			}
 		});
@@ -138,20 +143,24 @@ public class OrientatUA2 extends Activity {
 		ArrayList<String> distance=new ArrayList<String>();				
 				
 		Location current=gps.getCurrentLocation();		
-		Address address=gps.getCoordinates(destination+" Universidad de Alicante, Alicante, EspaÃ±a");
+		Address address=gps.getCoordinates(destination+" Universidad de Alicante, Alicante, España");
 					
 		if(address!=null) {
 			
 			distance.add("Address ok");
 			directioner.makeRequest(current.getLatitude()+","+current.getLongitude(),address.getLatitude()+","+address.getLongitude());
-			IndicationThread thread=new IndicationThread(gps, directioner.getDirection().getSteps().get(0), voicer, getApplicationContext());
+			//thread=new IndicationThread(gps, directioner.getDirection().getSteps().get(0), voicer, getApplicationContext());
 			voicer.speak(directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint()));
-			thread.run();
+			
+			//timer = new Timer();
+			//timer.schedule(thread, 1000, (directioner.getDirection().getSteps().get(0).getDuration().getValue()/4)*1000);
+			//timer.schedule(thread, 1000, 5000);
+			
 			voicer.setType(3);
 			startVoiceRecognitionActivity();
 			//Toast.makeText(getApplicationContext(), "Address OK", Toast.LENGTH_SHORT).show();
-		}
-		/*else
+		}/*
+		else
 			Toast.makeText(getApplicationContext(), "Address null", Toast.LENGTH_SHORT).show();*/
 		
 		wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,distance));
@@ -162,38 +171,48 @@ public class OrientatUA2 extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{	
 		int type=voicer.getType();
-		String answer;				
+		String answer="";				
 		
 	    if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
 	    {	        
+	    	boolean found=false;
 	        ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 	        wordsList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,matches));	     
 	        
 	        switch(type) {
 	        	case 0: //Ordenes generales
 	        			voicer.resetResults();
+	        			found=false;
+	        			
 	        			for(String word: matches) {	        	
-				        	if(word.toLowerCase(Locale.getDefault()).contains("donde estoy") || word.toLowerCase(Locale.getDefault()).contains("dï¿½nde estoy"))
+				        	if(word.toLowerCase(Locale.getDefault()).contains("donde estoy") || word.toLowerCase(Locale.getDefault()).contains("dónde estoy")) {
+				        		found=true;
 				        		getCurrentLocation();
-				        	
-				        	else if(word.toLowerCase(Locale.getDefault()).contains("ir a destino")) {				        		
-				        		voicer.speak("Diga el destino");	
-				        		//voicer.waitSpeaking();	 
-				        		voicer.setType(1);
-				        		startVoiceRecognitionActivity();	
+				        		break;
+				        	}				        	
+				        	else if(word.toLowerCase(Locale.getDefault()).contains("ir a destino")) {
+				        		found=true;
+				        		voicer.speak("Diga el destino");					        		
+				        		voicer.setType(1);				        		
 				        		break;
 				        	}
-				        	else if(word.equalsIgnoreCase("Salir"))
+				        	else if(word.equalsIgnoreCase("Salir")) {
+				        		//timer.cancel();
 				        		finish();	        	
+				        	}				        
 				        }
+	        			if(!found)
+	        				voicer.speak("No le he entendido, repita.");
+	        			
+	        			startVoiceRecognitionActivity();	
 			        	break;
 	        	case 1: //Orden ir a destino, preguntamos confirmacion
 	        			
-	        			voicer.setResults( data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
+	        			voicer.setResults(matches);
 	        			destination=voicer.getResult();	  
 	        			
 	        			if(destination!=null) {	        			
-		        			voicer.speak("Â¿Ha dicho "+destination+"?");
+		        			voicer.speak("¿Ha dicho "+destination+"?");
 		        			voicer.setType(2);
 		        			startVoiceRecognitionActivity();
 	        			}
@@ -208,46 +227,96 @@ public class OrientatUA2 extends Activity {
 	        			break;
 	        			
 	        	case 2: //Confirmacion de destino
-	        			answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
-	        			
-	        			if(answer.toLowerCase(Locale.getDefault()).contains("sÃ­") || answer.toLowerCase(Locale.getDefault()).contains("si")) 
-	        				getRoute();	        			
-	        			else if(answer.toLowerCase(Locale.getDefault()).contains("no")) {
-	        				voicer.setType(1);
+	        			//answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);	        			
+	        			//if(answer.toLowerCase(Locale.getDefault()).contains("sí") || answer.toLowerCase(Locale.getDefault()).contains("si"))
+	        			found=false;
+	        			for(String word : matches) {
+	        				if(word.toLowerCase(Locale.getDefault()).contains("sí") || word.toLowerCase(Locale.getDefault()).contains("si")) {
+	        					found=true;
+	        					getRoute();
+	        					break;
+	        				}
+	        				else if(word.toLowerCase(Locale.getDefault()).contains("no")) {
+	        					found=true;
+		        				voicer.setType(1);
+		        				startVoiceRecognitionActivity();
+		        				break;
+		        			}
+	        			}	        		
+	        			if(!found) {
+	        				voicer.speak("Repita la respuesta.");
 	        				startVoiceRecognitionActivity();
 	        			}
 	        			break;
 	        			
 	        	case 3:
-		        		answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
-		        		//Toast.makeText(getApplicationContext(), "Compass: "+compass.getCardinalPoint(), Toast.LENGTH_SHORT).show();
-		        		
-	        			if(answer.toLowerCase(Locale.getDefault()).contains("siguiente")) {//Siguiente indicaciÃ³n	        				
-	        				answer=directioner.getIndication(directioner.getIndex()+1,compass.getCardinalPoint());	        				        				
-	        				voicer.speak(answer);
-	        			}	        			
-	        			else if(answer.toLowerCase(Locale.getDefault()).contains("repetir")) { //Repetir indicaciÃ³n actual
+	        			/*if(thread.isChanged()) {
+	        				thread.setRunning(false);
+	        				timer.cancel();
+	        				directioner.nextIndex();
 	        				answer=directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint());
-	        				voicer.speak(answer);
+	        				voicer.speak(answer);	        				
+	        				thread=new IndicationThread(gps, directioner.getDirection().getSteps().get(directioner.getIndex()), voicer, getApplicationContext());	        					        			
+	        				timer=new Timer();	        				
+	        				//timer.schedule(thread, 1000, (directioner.getDirection().getSteps().get(directioner.getIndex()).getDuration().getValue()/4)*1000);
+	        				timer.schedule(thread, 6000, 5000);
 	        			}
-	        			else if(answer.toLowerCase(Locale.getDefault()).contains("salir")) { //Salir de la aplicaciÃ³n	        				
-	        				finish();	        				
-	        			}
+	        			else {*/
+	        				int situation=directioner.checkPosition(gps.getCurrentLocation(),voicer);
+	        				situation=0;
+	        				if(situation==2) {
+	        					directioner.nextIndex();
+		        				answer=directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint());
+		        				voicer.speak(answer);	        				
+	        				}
+	        				else if(situation==0) {	        					
+	        					answer=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);			        		
+				        		
+			        			if(answer.toLowerCase(Locale.getDefault()).contains("siguiente")) {//Siguiente indicaciÃ³n	        				
+			        				answer=directioner.getIndication(directioner.getIndex()+1,compass.getCardinalPoint());	        				        				
+			        				voicer.speak(answer);		        				
+			        			}	        			
+			        			else if(answer.toLowerCase(Locale.getDefault()).contains("repetir")) { //Repetir indicaciÃ³n actual
+			        				answer=directioner.getIndication(directioner.getIndex(),compass.getCardinalPoint());
+			        				voicer.speak(answer);
+			        			}
+			        			else if(answer.toLowerCase(Locale.getDefault()).contains("salir")) { //Salir de la aplicaciÃ³n
+			        				//timer.cancel();
+			        				finish();	        				
+			        			}
+	        				}			        				        			        		  
+	        			//}
 	        			voicer.setType(3);	        		    	
-        		    	startVoiceRecognitionActivity();        		    	
+        		    	startVoiceRecognitionActivity();
 	        			break;	        			
 	        }
 	    }
-	    else {		    		    	
-	    	if(voicer.getType()!=3) {
+	    else {		 
+	    	checkMissUnderstood(type);
+	    	/*if(voicer.getType()!=3) {
 	    		voicer.speak("No se ha podido reconocer el destino, por favor, repita. O diga Terminar.");
 	    		voicer.setType(1);	    		
 	    	}
 	    	else
-	    		voicer.setType(3);
-	    	
+	    		voicer.setType(3);*/	    	
 	    	startVoiceRecognitionActivity();
 	    }	    
 	    super.onActivityResult(requestCode, resultCode, data);	
-	}		
+	}
+	
+	public void checkMissUnderstood(int type) {
+		String answer="";
+		switch(type) {
+			case 0: 
+					answer="No le he entendido, repita, por favor.";
+					break;
+			
+			case 2:
+					answer="Por favor, repita la respuesta.";
+					break;
+			
+		}
+		voicer.speak(answer);
+		//startVoiceRecognitionActivity();
+	}
 }

@@ -1,13 +1,16 @@
 package com.orientatua.direction;
 
+import java.util.TimerTask;
+
 import android.content.Context;
 import android.location.Location;
+import android.os.Handler;
 import android.widget.Toast;
 
 import com.orientatua.GPSManager;
 import com.orientatua.VoiceManager;
 
-public class IndicationThread extends Thread {
+public class IndicationThread extends TimerTask {
 	private boolean running;
 	private long timer;
 	private Step step;		
@@ -15,11 +18,16 @@ public class IndicationThread extends Thread {
 	private float distance;
 	private VoiceManager voicer;
 	private Context context;	
+	private boolean change;
+	
+	private int amount;
 		
 	public IndicationThread(GPSManager _gps,Step _step,VoiceManager _voicer, Context _context) {
 		context=_context;		
 		running=true;
 		distance=0;
+		change=false;
+		amount=0;
 		try {			
 			step=_step;
 			timer=step.getDuration().getValue();
@@ -43,26 +51,34 @@ public class IndicationThread extends Thread {
 		step=_step;
 	}
 	
+	public boolean isChanged() {
+		return change;
+	}
+	//final Handler handler=new Handler();
+	
 	@Override	
 	public void run() {
-		float[] results=new float[3];
-		Location current;
-		while(running) {
-			try {		
-				current=gps.getCurrentLocation();														
-				Location.distanceBetween(current.getLatitude(), current.getLongitude(), step.getLocation().getLatitude(), step.getLocation().getLongitude(), results);
+		if(running) {
+			try {
+				float[] results=new float[3];
+				Location current;
+				current=gps.getCurrentLocation();		
+				Location.distanceBetween(current.getLatitude(), current.getLongitude(), step.getLocation().getLatitude(), step.getLocation().getLongitude(), results);		
 				distance=results[0];
-				Toast.makeText(context, "Quedan: "+distance, Toast.LENGTH_SHORT).show();
-				Thread.sleep(5000);
-				running=false;
 				
-			}catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				amount++;
+				
+				if(amount==3) {
+					change=true;
+					voicer.speak("Para");
+					amount=0;
+				}
+				else
+					voicer.speak("Continúa "+(int)distance);
+			}										
+			catch(Exception ex) {
+				voicer.speak("Excepcionaca");
 			}
-			catch (NullPointerException ex)  {
-				Toast.makeText(context, "Nullpointer", Toast.LENGTH_SHORT).show();
-			}
-		}
+		}		
 	}
 }

@@ -4,7 +4,7 @@ import java.util.Locale;
 
 public enum Orientation {
 	NORTH("norte"),
-	NORTH_EAST("noreste"),
+	NORTH_EAST("nordeste"),
 	EAST("este"),
 	SOUTH_EAST("sureste"),
 	SOUTH("sur"),

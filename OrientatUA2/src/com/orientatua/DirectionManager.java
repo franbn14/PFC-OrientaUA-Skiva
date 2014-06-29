@@ -1,7 +1,6 @@
 package com.orientatua;
 
 import java.io.BufferedInputStream;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +20,13 @@ import com.google.gson.reflect.TypeToken;
 import com.orientatua.direction.*;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
+
 import java.lang.reflect.Type;
+
 import android.text.Html;
 
 public class DirectionManager {
@@ -33,6 +35,8 @@ public class DirectionManager {
 	private Context context;
 	private String destination;
 	private int index;	
+	private int remining;
+	private int total;
 	
 	public DirectionManager(Context _context) {
 		context=_context;
@@ -45,9 +49,9 @@ public class DirectionManager {
 			String result=request.get();
 			
 			if(result!=null) {
-				Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
-				if(!parseJSON(result))  
-					Toast.makeText(context, "Result null", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+				parseJSON(result);  
+					//Toast.makeText(context, "Result null", Toast.LENGTH_SHORT).show();
 			}
 			else {
 				Log.i("Result","NULL");				
@@ -74,13 +78,16 @@ public class DirectionManager {
             Type collectionType = new TypeToken<Direction>(){}.getType();
 			direction=gson.fromJson(result, collectionType);
 			
-			if(direction.getStatus().equals("OK")) { //El status lo reconoce				
-				if(direction.getRoutes()==null) //Fallo con routes
+			if(direction.getStatus().equals("OK")) { //El status lo reconoce		
+				index=0;				
+				total=direction.getSteps().get(0).getDistance().getValue();
+				remining=total;
+				/*if(direction.getRoutes()==null) //Fallo con routes
 					Toast.makeText(context, "Vacio", Toast.LENGTH_SHORT).show();
 				else
-					Toast.makeText(context, "No vacio", Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, "No vacio", Toast.LENGTH_SHORT).show();*/
 				
-			Toast.makeText(context,direction.getRoutes().get(0).getLegs().get(0).getSteps().get(0).getInstruction(),Toast.LENGTH_SHORT).show();
+			//Toast.makeText(context,direction.getRoutes().get(0).getLegs().get(0).getSteps().get(0).getInstruction(),Toast.LENGTH_SHORT).show();
 				return true;
 			}
 			else
@@ -99,20 +106,20 @@ public class DirectionManager {
 			indication=Html.fromHtml(direction.getSteps().get(hopedIndex).getInstruction()).toString();			
 			
 			String[] words=indication.split("\\s+");
-			Toast.makeText(context, "User: "+orientation.getValue()+" Palabras: "+words[0]+" "+words[1]+" "+words[2]+" "+words[3], Toast.LENGTH_SHORT).show();		
+			//Toast.makeText(context, "User: "+orientation.getValue()+" Palabras: "+words[0]+" "+words[1]+" "+words[2]+" "+words[3], Toast.LENGTH_SHORT).show();		
 			for(String word: words) {
 				if(Orientation.contains(word)) {									
 					indication=checkPosition(orientation, Orientation.getValueOf(word)).toString();
 					break;
 				}
 			}
-			Toast.makeText(context, "Despues: "+indication, Toast.LENGTH_SHORT).show();
-			indication+=". ContinÃºa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
+			//Toast.makeText(context, "Despues: "+indication, Toast.LENGTH_SHORT).show();
+			indication+=". Continúa "+direction.getSteps().get(hopedIndex).getDistance().getValue()+" metros";			
 		}
 		else if(hopedIndex==index)
 			indication="Ha llegado a su destino";
 		else
-			indication="El prÃ³ximo punto es su destino";
+			indication="El próximo punto es su destino";
 		
 		return indication;
 	}	
@@ -123,6 +130,11 @@ public class DirectionManager {
 	
 	public void nextIndex() {
 		index++;
+		
+		if(index<direction.getSteps().size()) {
+			total=direction.getSteps().get(index).getDistance().getValue();
+			remining=total;			
+		}
 	}
 	
 	public Orientation checkPosition(Orientation user, Orientation indication) {		
@@ -441,7 +453,23 @@ public class DirectionManager {
 				return null;
 			}		
 			return null;
+		}		
+	}
+	
+	public int checkPosition(Location current, VoiceManager voicer) {
+		Step step=direction.getSteps().get(index);
+		float[] results=new float[3];			
+		Location.distanceBetween(current.getLatitude(), current.getLongitude(), step.getLocation().getLatitude(), step.getLocation().getLongitude(), results);			
+		int distance=(int)results[0];
+		
+		if(distance<=5) 
+			return 2;
+		else if(distance<=remining-(total/4)) {
+			remining-=(total/4);
+			voicer.speak("Continúa "+distance+" metros");
+			return 1;
 		}
 		
+		return 0;		
 	}
 }

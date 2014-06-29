@@ -46,11 +46,11 @@ public class VoiceManager extends Activity  {
 				if (status == TextToSpeech.SUCCESS) {
 					speaker.setLanguage(Locale.getDefault());
 					
-					speak("Bienvenido, Â¿quÃ© desea hacer?");	
+					speak("Bienvenido, ¿qué desea hacer?");	
 					//startVoiceRecognitionActivity(0);	
 				}
-				else
-					Toast.makeText( context, "Error al inicializar TextToSpeech", Toast.LENGTH_SHORT ).show();
+				//else
+					//Toast.makeText( context, "Error al inicializar TextToSpeech", Toast.LENGTH_SHORT ).show();
 				
 			}
 		});
@@ -73,7 +73,11 @@ public class VoiceManager extends Activity  {
 	
 	public void speak(String message) {
 		speaker.speak(message, TextToSpeech.QUEUE_FLUSH, null);
-		waitSpeaking();			
+		//waitSpeaking();
+		boolean speaking;
+		do {
+			speaking=speaker.isSpeaking();
+		} while(speaking);
 	}
 	
 	public void waitSpeaking() {
